@@ -72,7 +72,7 @@ export default function RoadmapGenerator() {
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
-  // const url = import.meta.env.VITE_API_URL;
+  // ...existing code...
   const url = "https://carrersync-ai-1.onrender.com";
   
 

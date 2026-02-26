@@ -19,7 +19,7 @@ connectDB();
 app.use(cors({
   origin: [
     "http://localhost:3001",
-    "https://carrersync-ai-1.onrender.com",
+    "https://carrersync-ai-2.onrender.com",
   ],
   credentials: true
 }));

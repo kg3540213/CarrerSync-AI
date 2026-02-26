@@ -17,7 +17,7 @@ const PathwayDetails = () => {
 
   const pathway = useMemo(() => pathways.find(p => p.id === pathwayId), [pathwayId]);
    // Update with your backend URL or use environment variable
- const url = "https://carrersync-ai-1.onrender.com";
+ const url = "https://carrersync-ai-2.onrender.com";
   useEffect(() => {
     if (!pathway) {
       toast.error('Pathway not found');
@@ -57,7 +57,7 @@ const PathwayDetails = () => {
     const newStatus = !subscriptionStatus;
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/pathway-subscribe`, {
+      const response = await fetch(`${url}/api/pathway-subscribe`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

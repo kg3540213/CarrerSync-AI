@@ -16,7 +16,7 @@ const LearningPage = () => {
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
   // const url = "https://career-ai-mern.onrender.com";
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://carrersync-ai-2.onrender.com";
 
   const checkCourseAccess = useCallback(async () => {
     try {

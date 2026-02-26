@@ -12,8 +12,8 @@ const Cart = () => {
   const [enrolledResources, setEnrolledResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  // const url = import.meta.env.VITE_API_URL;
-  const url = "https://carrersync-ai-1.onrender.com";
+  // ...existing code...
+  const url = "https://carrersync-ai-2.onrender.com";
 
   useEffect(() => {
     const fetchCartItems = async () => {

@@ -15,8 +15,8 @@ const ResourceDetails = () => {
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [enrolledIds, setEnrolledIds] = useState([]);
-  // const url = import.meta.env.VITE_API_URL;
-  const url = "https://carrersync-ai-1.onrender.com";
+  // ...existing code...
+  const url = "https://carrersync-ai-2.onrender.com";
 
   const resource = useMemo(
     () => resources.find((r) => r.resourceId === resourceId),
