@@ -17,7 +17,7 @@ const Navbar = () => {
   const { openSignIn } = useClerk();
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
-  const url = import.meta.env.VITE_API_URL;
+  const url = "https://carrersync-ai-1.onrender.com";
 
  const fetchCartCount = async () => {
   if (user?.primaryEmailAddress?.emailAddress) {

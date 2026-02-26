@@ -18,7 +18,8 @@ const Payment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeCard, setActiveCard] = useState('visa');
   const [showConfirm, setShowConfirm] = useState(false);
-  const url = import.meta.env.VITE_API_URL;
+  // const url = import.meta.env.VITE_API_URL;
+  const url = "https://carrersync-ai-1.onrender.com";
 
   const navigate = useNavigate();
 

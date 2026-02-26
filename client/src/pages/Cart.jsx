@@ -12,7 +12,8 @@ const Cart = () => {
   const [enrolledResources, setEnrolledResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const url = import.meta.env.VITE_API_URL;
+  // const url = import.meta.env.VITE_API_URL;
+  const url = "https://carrersync-ai-1.onrender.com";
 
   useEffect(() => {
     const fetchCartItems = async () => {

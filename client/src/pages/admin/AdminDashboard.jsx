@@ -9,7 +9,8 @@ import { pathways } from '../../assets/pathwaysData';
 
 const AdminDashboardContent = () => {
   const navigate = useNavigate();
-  const url = "https://career-ai-mern.onrender.com";
+  // const url = "https://career-ai-mern.onrender.com";
+  const url = "https://carrersync-ai-1.onrender.com";
   const [activeSection, setActiveSection] = useState(() => {
     // Get last active section from localStorage
     return localStorage.getItem('adminActiveSection') || 'profile';
