@@ -18,9 +18,8 @@ connectDB();
 // Middleware
 app.use(cors({
   origin: [
-    "http://localhost:5173",
     "http://localhost:3001",
-    "https://career-ai-mern.onrender.com",
+    "https://carrersync-ai-1.onrender.com",
   ],
   credentials: true
 }));
