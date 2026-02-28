@@ -1,80 +1,92 @@
-# Career_AI
+# CareerSync-AI
 
-Career_AI is a full-stack web application for AI-powered career guidance, learning pathways, and course management. It consists of a React client and a Node.js/Express server with MongoDB.
-
+CareerSync-AI is a comprehensive platform designed to help users explore, compare, and plan their career pathways. It provides personalized recommendations, industry insights, skill development resources, and interactive tools for both learners and administrators.
 ## Features
-- AI-powered career roadmap generation (Gemini API)
-- Course enrollment and management
-- Learning pathway subscription
-- Admin dashboard for content management
-- User authentication (Clerk)
-- Responsive UI with modern design
+
+- **Career Pathways Explorer:** Browse and compare various career paths with detailed information and visualizations.
+- **Skill Hub:** Access curated resources to develop relevant skills for your chosen career.
+- **Industry Trends:** Stay updated with the latest trends and insights in different industries.
+- **Roadmap Generator:** Create personalized learning and career roadmaps.
+- **Comparison Tool:** Compare courses, pathways, and resources side-by-side.
+- **Chatbot:** Get instant answers and guidance using AI-powered chat.
+- **Admin Dashboard:** Manage courses, resources, and pathway content securely.
 
 ## Project Structure
+
 ```
-client/   # React frontend
-server/   # Node.js backend
+client/
+  src/
+    components/
+    pages/
+    services/
+  public/
+  index.html
+  package.json
+  vite.config.js
+server/
+  app.js
+  config/
+  models/
+  routes/
+  package.json
 ```
 
-## Setup Instructions
+## Technologies Used
 
-### 1. Clone the repository
-```
-git clone <repo-url>
-cd Career_AI
-```
+- **Frontend:** React, Vite, Clerk authentication, Gemini API
+- **Backend:** Node.js, Express, MongoDB
+- **Other:** Email integration, Admin tools
 
-### 2. Install dependencies
-#### Client
-```
-cd client
-npm install
-```
-#### Server
-```
-cd ../server
-npm install
-```
+## Environment Variables
 
-### 3. Environment Variables
-- Create `.env` files in both client and server folders.
-- Example for client/.env:
+Set the following variables in your `.env` files:
+
 ```
-VITE_API_URL=http://localhost:3001
-VITE_CLERK_PUBLISHABLE_KEY=<your-clerk-key>
-```
-- Example for server/.env:
-```
-PORT=3001
-MONGO_URI=<your-mongodb-uri>
-GEMINI_API_KEY=<your-gemini-api-key>
+VITE_API_URL=<your_backend_url>
+VITE_CLERK_PUBLISHABLE_KEY=<your_clerk_key>
+VITE_ADMIN_NAME=<admin_name>
+VITE_EMAIL_USER=<email_user>
+VITE_EMAIL_PASS=<email_pass>
+VITE_GEMINI_API_KEY=<gemini_api_key>
 ```
 
-### 4. Start the development servers
-#### Client
-```
-cd client
-npm run dev
-```
-#### Server
-```
-cd server
-nodemon app.js
-```
+## Getting Started
 
-## Usage
-- Access the client at http://localhost:5173
-- The server runs at http://localhost:3001
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/kg3540213/CarrerSync-AI.git
+   ```
+2. **Install dependencies:**
+   - For client:
+     ```bash
+     cd client
+     npm install
+     ```
+   - For server:
+     ```bash
+     cd server
+     npm install
+     ```
+3. **Configure environment variables:**
+   - Add your keys and credentials to `.env` files in both `client` and `server` folders.
+4. **Run the project:**
+   - Start the backend:
+     ```bash
+     npm start
+     ```
+   - Start the frontend:
+     ```bash
+     npm run dev
+     ```
 
-## Folder Overview
-- `client/src/` - React components, pages, assets, services
-- `server/routes/` - Express API routes
-- `server/models/` - Mongoose models
+## Contributing
 
-## Tech Stack
-- React, Vite, Clerk, Axios, Tailwind CSS
-- Node.js, Express, MongoDB, Mongoose
-- Gemini API (for AI roadmap generation)
+Contributions are welcome! Please open issues or submit pull requests for improvements or bug fixes.
 
 ## License
-MIT
+
+This project is licensed under the MIT License.
+
+---
+
+For more information, visit the [GitHub repository](https://github.com/kg3540213/CarrerSync-AI).
