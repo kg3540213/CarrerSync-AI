@@ -27,14 +27,14 @@ const AllResources = () => {
   const [filteredResources, setFilteredResources] = useState([]);
   const [enrolledIds, setEnrolledIds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  // const url = "https://career-ai-mern.onrender.com";
-  const url = "https://carrersync-ai-1.onrender.com";
+  // Use relative path for API to support Vite proxy in dev
+  const url = "";
 
   useEffect(() => {
     const fetchEnrolled = async () => {
       try {
         setIsLoading(true);
-        const res = await fetch(`${url}/api/course/enrolled-ids`, {
+        const res = await fetch(`/api/course/enrolled-ids`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userEmail: user?.primaryEmailAddress?.emailAddress })

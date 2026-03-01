@@ -14,7 +14,7 @@ const Chatbot = () => {
   const { isSignedIn } = useAuth();
   const { user } = useUser();
   const navigate = useNavigate();
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://carrersync-ai-2.onrender.com";
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {

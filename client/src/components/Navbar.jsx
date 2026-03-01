@@ -17,12 +17,14 @@ const Navbar = () => {
   const { openSignIn } = useClerk();
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
-  const url = "https://carrersync-ai-1.onrender.com";
+  // Use relative path for API to support Vite proxy in dev
+  const url = "";
+  
 
  const fetchCartCount = async () => {
   if (user?.primaryEmailAddress?.emailAddress) {
     try {
-      const res = await fetch(`${url}/api/course/count`, {
+      const res = await fetch(`/api/course/count`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -42,7 +44,7 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchCartCount();
-    const interval = setInterval(fetchCartCount, 100); // poll every 2s for live update
+    const interval = setInterval(fetchCartCount, 2000); // poll every 2s for live update
     return () => clearInterval(interval);
   }, [user]);
 

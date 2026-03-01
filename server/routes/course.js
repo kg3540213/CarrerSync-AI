@@ -48,6 +48,7 @@ router.post("/course/count", async (req, res) => {
     if (!userEmail) return res.status(400).json({ error: "Missing userEmail" });
 
     const count = await Course.countDocuments({ user_email: userEmail });
+    console.log(`Course count for ${userEmail}: ${count}`);
     return res.status(200).json({ count });
   } catch (err) {
     console.error("Course count error:", err);
