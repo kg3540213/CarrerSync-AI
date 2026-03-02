@@ -59,7 +59,7 @@ const Cart = () => {
     const userEmail = user.primaryEmailAddress.emailAddress;
 
     try {
-      const res = await fetch(`/api/course-toggle`, {
+      const res = await fetch(`${url}/api/course-toggle`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userEmail, resourceId, addedToCart: false })
