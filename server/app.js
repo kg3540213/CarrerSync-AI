@@ -16,14 +16,15 @@ const PORT = process.env.PORT || 3001;
 connectDB();
 
 // Middleware
-app.use(cors({
-  origin: [
-      "http://localhost:3001",
-      "https://carrersync-ai-2.onrender.com",
-      "http://localhost:5173",
-  ],
-  credentials: true
-}));
+// app.use(cors({
+//   origin: [
+//       "http://localhost:3001",
+//       "https://carrersync-ai-2.onrender.com",
+//       "http://localhost:5173",
+//   ],
+//   credentials: true
+// }));
+app.use(cors());
 app.use(bodyParser.json());
 app.use(express.json());
 
