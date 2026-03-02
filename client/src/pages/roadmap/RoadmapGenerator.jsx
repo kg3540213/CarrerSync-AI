@@ -73,7 +73,7 @@ export default function RoadmapGenerator() {
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
   // ...existing code...
-  const url = "https://carrersync-ai-2.onrender.com";
+  const url = "https://carrersync-ai-1.onrender.com";
   
 
   // Apply theme and sidebar preferences
