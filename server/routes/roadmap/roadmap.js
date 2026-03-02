@@ -8,6 +8,7 @@ require("dotenv").config();
 router.post("/", async (req, res) => {
   const { prompt, email } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
+  console.log("Received roadmap request:", { prompt, email });
 
   try {
     // Call Gemini API
@@ -21,6 +22,7 @@ router.post("/", async (req, res) => {
         }),
       }
     );
+    console.log("Gemini API response status:", response.status);
 
     const data = await response.json();
     const roadmap =

@@ -105,7 +105,7 @@ const DashboardContent = () => {
     const fetchSubscribedPathways = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get(`${url}/api/user-pathways`, {
+        const res = await axios.get(`/api/user-pathways`, {
           params: { email: user.primaryEmailAddress.emailAddress }
         });
 
@@ -130,7 +130,7 @@ const DashboardContent = () => {
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
-        const res = await axios.post(`${url}/api/course/enrolled-ids`, {
+        const res = await axios.post(`/api/course/enrolled-ids`, {
           userEmail: user.primaryEmailAddress.emailAddress,
         });
 

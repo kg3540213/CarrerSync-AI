@@ -14,7 +14,7 @@ const ComparisonToolPage = () => {
   const pdfRef = useRef(null);
   const navigate = useNavigate();
   // const url = "https://career-ai-mern.onrender.com";
-  const url = "https://carrersync-ai-1.onrender.com";
+  // const url = "https://carrersync-ai-1.onrender.com";
 
   // Sample career data with more detailed information
   const allCareers = [

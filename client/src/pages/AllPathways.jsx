@@ -17,7 +17,7 @@ const AllPathways = () => {
   const [filteredPathways, setFilteredPathways] = useState([]);
   const [subscribedPathwayIds, setSubscribedPathwayIds] = useState([]);
   // const url = "https://career-ai-mern.onrender.com";
-  const url = "https://carrersync-ai-1.onrender.com";
+  // const url = "https://carrersync-ai-1.onrender.com";
 
   // 🔁 Fetch subscribed pathway IDs
   useEffect(() => {
@@ -26,7 +26,7 @@ const AllPathways = () => {
 
       try {
         const res = await fetch(
-          `${url}/api/user-pathways?email=${user.primaryEmailAddress.emailAddress}`
+          `/api/user-pathways?email=${user.primaryEmailAddress.emailAddress}`
         );
         const data = await res.json();
         if (res.ok && data.pathwayIds) {
