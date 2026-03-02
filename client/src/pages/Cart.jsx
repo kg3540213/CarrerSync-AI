@@ -24,7 +24,7 @@ const Cart = () => {
       }
 
       try {
-        const res = await fetch(`/api/enrolled`, {
+        const res = await fetch(`${url}/api/enrolled`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
