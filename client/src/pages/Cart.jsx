@@ -13,7 +13,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   // ...existing code...
-  const url = "https://carrersync-ai-2.onrender.com";
+  const url = "https://carrersync-ai-1.onrender.com";
 
   useEffect(() => {
     const fetchCartItems = async () => {

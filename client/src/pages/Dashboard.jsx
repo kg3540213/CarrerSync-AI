@@ -90,7 +90,7 @@ const DashboardContent = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
   // ...existing code...
-  const url = "https://carrersync-ai-2.onrender.com";
+  const url = "https://carrersync-ai-1.onrender.com";
 
   const sidebarItems = [
     { id: "profile", icon: <User className="w-5 h-5" />, label: "Profile" },

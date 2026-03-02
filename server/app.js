@@ -17,10 +17,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: [
-      "https://carrersync-ai-2.onrender.com",
-      "http://localhost:5173",
-  ],
+  origin: "https://carrersync-ai-2.onrender.com",
   credentials: true
 }));
 app.use(bodyParser.json());

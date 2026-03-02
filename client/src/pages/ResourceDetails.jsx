@@ -17,7 +17,7 @@ const ResourceDetails = () => {
   const [enrolledIds, setEnrolledIds] = useState([]);
   // ...existing code...
   // Use relative path for API to support Vite proxy in dev
-  const url = "";
+  const url = "https://carrersync-ai-1.onrender.com";
 
   const resource = useMemo(
     () => resources.find((r) => r.resourceId === resourceId),
@@ -45,7 +45,7 @@ const ResourceDetails = () => {
         setIsLoading(true);
         try {
           // 1. Check if this course is in user's cart
-          const res = await fetch(`/api/enrolled`, {
+          const res = await fetch(`${url}/api/enrolled`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userEmail: user.primaryEmailAddress.emailAddress })
@@ -57,7 +57,7 @@ const ResourceDetails = () => {
           }
 
           // 2. Fetch all enrolled course IDs
-          const res2 = await fetch(`/api/course/enrolled-ids`, {
+          const res2 = await fetch(`${url}/api/course/enrolled-ids`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ userEmail: user.primaryEmailAddress.emailAddress })
@@ -85,7 +85,7 @@ const ResourceDetails = () => {
     const email = user?.primaryEmailAddress?.emailAddress;
 
     try {
-      const res = await fetch(`/api/course-toggle`, {
+      const res = await fetch(`${url}/api/course-toggle`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

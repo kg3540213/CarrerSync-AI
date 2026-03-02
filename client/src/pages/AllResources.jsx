@@ -28,7 +28,7 @@ const AllResources = () => {
   const [enrolledIds, setEnrolledIds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   // Use relative path for API to support Vite proxy in dev
-  // const url = "https://carrersync-ai-2.onrender.com";
+  const url = "https://carrersync-ai-1.onrender.com";
 
   useEffect(() => {
     const fetchEnrolled = async () => {
