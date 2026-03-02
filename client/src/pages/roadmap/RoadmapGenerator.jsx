@@ -104,7 +104,7 @@ export default function RoadmapGenerator() {
     try {
       if (!user?.primaryEmailAddress?.emailAddress) return;
       const res = await fetch(
-        `/api/roadmap/history?email=${user.primaryEmailAddress.emailAddress}`
+        `${url}/api/roadmap/history?email=${user.primaryEmailAddress.emailAddress}`
       );
       const data = await res.json();
       if (data.success) {
@@ -121,7 +121,7 @@ export default function RoadmapGenerator() {
   const deleteHistoryItem = async (id, e) => {
     e?.stopPropagation();
     try {
-      const res = await fetch(`/api/roadmap/history/${id}`, {
+      const res = await fetch(`${url}/api/roadmap/history/${id}`, {
         method: "DELETE"
       });
       const data = await res.json();
@@ -202,7 +202,7 @@ export default function RoadmapGenerator() {
     setMessages(prev => [...prev, userMessage]);
     setPrompt("");
     try {
-      const res = await fetch(`/api/roadmap`, {
+      const res = await fetch(`${url}/api/roadmap`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
