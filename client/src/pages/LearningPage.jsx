@@ -15,8 +15,7 @@ const LearningPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
-  // const url = "https://career-ai-mern.onrender.com";
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://career-ai-mern.onrender.com";
 
   const checkCourseAccess = useCallback(async () => {
     try {
@@ -29,7 +28,7 @@ const LearningPage = () => {
       }
 
       if (isSignedIn) {
-        const response = await fetch(`/api/course/enrolled-ids`, {
+        const response = await fetch(`${url}/api/course/enrolled-ids`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userEmail: user.primaryEmailAddress.emailAddress }),

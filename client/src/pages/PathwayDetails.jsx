@@ -16,8 +16,8 @@ const PathwayDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const pathway = useMemo(() => pathways.find(p => p.id === pathwayId), [pathwayId]);
-   // Update with your backend URL or use environment variable
- const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://career-ai-mern.onrender.com";
+
   useEffect(() => {
     if (!pathway) {
       toast.error('Pathway not found');

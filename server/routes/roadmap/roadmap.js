@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const mongoose = require("mongoose");
 const Roadmap = require("../../models/Roadmap"); // mongoose model
 require("dotenv").config();
 
@@ -8,12 +7,11 @@ require("dotenv").config();
 router.post("/", async (req, res) => {
   const { prompt, email } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
-  console.log("Received roadmap request:", { prompt, email });
 
   try {
     // Call Gemini API
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -22,7 +20,6 @@ router.post("/", async (req, res) => {
         }),
       }
     );
-    console.log("Gemini API response status:", response.status);
 
     const data = await response.json();
     const roadmap =
@@ -59,7 +56,7 @@ router.get("/history", async (req, res) => {
 router.delete("/history/:id", async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("Attempting to delete roadmap with ID:", id);
+
     // Validate ID before using it in query
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ success: false, message: "Invalid ID format" });

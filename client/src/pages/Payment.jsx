@@ -18,8 +18,7 @@ const Payment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeCard, setActiveCard] = useState('visa');
   const [showConfirm, setShowConfirm] = useState(false);
-  // ...existing code...
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://career-ai-mern.onrender.com";
 
   const navigate = useNavigate();
 

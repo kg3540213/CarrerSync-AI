@@ -4,7 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useClerk, useUser } from '@clerk/clerk-react';
 import BlurCircle from './BlurCircle';
-
 const MainBanner = () => {
   const navigate = useNavigate();
   const { isSignedIn } = useUser();

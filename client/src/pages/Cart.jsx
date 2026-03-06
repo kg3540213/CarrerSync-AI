@@ -12,8 +12,7 @@ const Cart = () => {
   const [enrolledResources, setEnrolledResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  // ...existing code...
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://career-ai-mern.onrender.com";
 
   useEffect(() => {
     const fetchCartItems = async () => {

@@ -9,7 +9,7 @@ import { pathways } from '../../assets/pathwaysData';
 
 const AdminDashboardContent = () => {
   const navigate = useNavigate();
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://career-ai-mern.onrender.com";
   const [activeSection, setActiveSection] = useState(() => {
     // Get last active section from localStorage
     return localStorage.getItem('adminActiveSection') || 'profile';
@@ -23,7 +23,7 @@ useEffect(() => {
       if (!res.ok) throw new Error('Network response was not ok');
 
       const data = await res.json();
-      setTotalUsers(data.count); 
+      setTotalUsers(data.count); // ✅ sets count
     } catch (err) {
       console.error('Failed to fetch active users', err);
     }

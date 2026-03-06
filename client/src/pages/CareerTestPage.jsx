@@ -19,7 +19,7 @@ export default function CareerTestPage() {
   const { user } = useUser();
 
   // ✅ Initialize Gemini SDK
-  // const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
+  const genAI = apiKey ? new GoogleGenerativeAI(apiKey) : null;
 
   const domains = [
     { id: 'webdev', name: 'Web Development', icon: '🌐' },
@@ -55,45 +55,24 @@ export default function CareerTestPage() {
 
   // ✅ Gemini API call using SDK
   const callGeminiAI = async (prompt, maxTokens = 1000) => {
-  if (!apiKey) {
-    throw new Error("Gemini API key missing");
-  }
+    if (!genAI) throw new Error("Gemini API key missing");
 
-  try {
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+    try {
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const response = await model.generateContent({
+        contents: [{ role: "user", parts: [{ text: prompt }] }],
+        generationConfig: {
+          maxOutputTokens: maxTokens,
+          temperature: 0.7,
         },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [{ text: prompt }],
-            },
-          ],
-          generationConfig: {
-            maxOutputTokens: maxTokens,
-            temperature: 0.7,
-          },
-        }),
-      }
-    );
+      });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error?.message || "Gemini API error");
+      return response.response.text();
+    } catch (err) {
+      console.error("Gemini API Error:", err);
+      throw new Error(err.message || "Failed to fetch from Gemini API");
     }
-
-    const data = await response.json();
-    return data.candidates?.[0]?.content?.parts?.[0]?.text || "";
-  } catch (err) {
-    console.error("Gemini API Error:", err);
-    throw err;
-  }
-};
+  };
 
   // ------------------ State Persistence ------------------ //
   useEffect(() => {

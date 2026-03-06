@@ -16,8 +16,7 @@ const AllPathways = () => {
   const [filter, setFilter] = useState('all');
   const [filteredPathways, setFilteredPathways] = useState([]);
   const [subscribedPathwayIds, setSubscribedPathwayIds] = useState([]);
-  
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://career-ai-mern.onrender.com";
 
   // 🔁 Fetch subscribed pathway IDs
   useEffect(() => {

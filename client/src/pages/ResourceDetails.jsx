@@ -15,9 +15,7 @@ const ResourceDetails = () => {
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [enrolledIds, setEnrolledIds] = useState([]);
-  // ...existing code...
-  // Use relative path for API to support Vite proxy in dev
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://career-ai-mern.onrender.com";
 
   const resource = useMemo(
     () => resources.find((r) => r.resourceId === resourceId),

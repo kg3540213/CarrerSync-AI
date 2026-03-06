@@ -72,8 +72,7 @@ export default function RoadmapGenerator() {
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
-  // ...existing code...
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://career-ai-mern.onrender.com";
   
 
   // Apply theme and sidebar preferences
@@ -110,7 +109,7 @@ export default function RoadmapGenerator() {
       if (data.success) {
         setHistory(data.history);
         if (data.history.length > 0 && !selectedHistory) {
-          setSelectedHistory(data.history[0]._id);
+          setSelectedHistory(data.history[0].id);
         }
       }
     } catch (err) {
@@ -242,7 +241,7 @@ export default function RoadmapGenerator() {
   };
 
   const loadHistoryItem = (id) => {
-    const item = history.find(h => h._id === id);
+    const item = history.find(h => h.id === id);
     if (item) {
       setSelectedHistory(id);
       setMessages([
@@ -411,18 +410,18 @@ export default function RoadmapGenerator() {
             <div className="space-y-2">
               {filteredHistory.map((item, index) => (
                 <div
-                  key={item._id}
+                  key={item.id}
                   className={`group relative p-4 rounded-xl cursor-pointer transition-all duration-300 hover:scale-[1.02] ${
-                    selectedHistory === item._id
+                    selectedHistory === item.id
                       ? (darkMode ? 'bg-gradient-to-r from-blue-900/40 to-purple-900/30 border-2 border-blue-500/30 shadow-lg' : 'bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200/50 shadow-lg')
                       : (darkMode ? 'bg-gray-700/30 hover:bg-gray-700/50 border border-gray-600/30' : 'bg-gray-50/50 hover:bg-white border border-gray-200/30')
                   } shadow-sm hover:shadow-md`}
-                  onClick={() => loadHistoryItem(item._id)}
+                  onClick={() => loadHistoryItem(item.id)}
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-start justify-between mb-2">
                     <div className="flex items-center gap-2">
                       <div className={`w-2 h-2 rounded-full ${
-                        selectedHistory === item._id
+                        selectedHistory === item.id
                           ? 'bg-blue-500 animate-pulse'
                           : darkMode ? 'bg-gray-500' : 'bg-gray-300'
                       }`} />
@@ -432,7 +431,7 @@ export default function RoadmapGenerator() {
                     </div>
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
-                        onClick={(e) => deleteHistoryItem(item._id, e)}
+                        onClick={(e) => deleteHistoryItem(item.id, e)}
                         className={`p-1 rounded-lg ${darkMode ? 'text-gray-400 hover:text-red-400' : 'text-gray-500 hover:text-red-500'} transition-colors`}
                         title="Delete conversation"
                       >

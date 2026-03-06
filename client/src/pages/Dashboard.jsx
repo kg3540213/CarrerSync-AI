@@ -89,8 +89,7 @@ const DashboardContent = () => {
   const [pathways, setPathways] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
-  // ...existing code...
-  const url = "https://carrersync-ai-1.onrender.com";
+  const url = "https://career-ai-mern.onrender.com";
 
   const sidebarItems = [
     { id: "profile", icon: <User className="w-5 h-5" />, label: "Profile" },
@@ -105,7 +104,7 @@ const DashboardContent = () => {
     const fetchSubscribedPathways = async () => {
       try {
         setIsLoading(true);
-        const res = await axios.get(`/api/user-pathways`, {
+        const res = await axios.get(`${url}/api/user-pathways`, {
           params: { email: user.primaryEmailAddress.emailAddress }
         });
 
@@ -130,7 +129,7 @@ const DashboardContent = () => {
   useEffect(() => {
     const fetchEnrolledCourses = async () => {
       try {
-        const res = await axios.post(`/api/course/enrolled-ids`, {
+        const res = await axios.post(`${url}/api/course/enrolled-ids`, {
           userEmail: user.primaryEmailAddress.emailAddress,
         });
 

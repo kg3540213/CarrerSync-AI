@@ -8,23 +8,33 @@ const About = () => {
   const teamMembers = [
     {
       id: 1,
-      name: "Koushik Ghosh",
+      name: "Amrit Raj",
       role: "Team Lead",
       bio: "Handles backend development and project coordination. Ensures smooth integration between frontend and backend.",
       image: "https://media.licdn.com/dms/image/v2/D5603AQGjrun6J6XnEA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1696413288165?e=1757548800&v=beta&t=Advuzq3N8FmLLWlPhICpLS1dY7nmd4LnEyQsXr2WX1U",
-      github: "https://github.com/kg3540213",
-      linkedin: "https://www.linkedin.com/in/koushik-programmer/",
-      email: "ghoshkoushik9434@gmail.com"
+      github: "https://www.linkedin.com/in/amrit-raj-54652b294/",
+      linkedin: "https://linkedin.com/in/amritraj",
+      email: "amritraj23@lpu.in"
     },
     {
       id: 2,
-      name: "Prince Kumar",
+      name: "Harsh Kumar",
       role: "Frontend Developer",
       bio: "Focuses on UI/UX and React components. Implements responsive designs and user interactions.",
       image: "https://media.licdn.com/dms/image/v2/D5603AQHFrUYNyV2_Yw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1689089288664?e=1757548800&v=beta&t=EW6CpR10wJryLvWTlxUtJpEawlfD-YuFxoLmy5br47w",
-      github: "https://github.com/PrinceArora12",
-      linkedin: "https://www.linkedin.com/in/princearora12/",
-      email: "prince.arora1028@gmail.com"
+      github: "https://github.com/harshkumar",
+      linkedin: "https://www.linkedin.com/in/harshkumar-0001-/",
+      email: "harsh@careerai.com"
+    },
+    {
+      id: 3,
+      name: "Vaibhav Tiwari",
+      role: "Full Stack Developer",
+      bio: "Works on both frontend and backend features. Implements core functionality and API integrations.",
+      image: "https://media.licdn.com/dms/image/v2/D5603AQGxl9imYRmQKg/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1718318372649?e=1757548800&v=beta&t=jkDtlqxFOvrbARrgZ792dxaTXAT3sCqsoPClg9ZFQjg",
+      github: "https://github.com/vaibhavtiwari",
+      linkedin: "https://www.linkedin.com/in/vaibhav-tiwari-664444284/",
+      email: "vaibhav@careerai.com"
     }
   ];
 
@@ -65,10 +75,6 @@ const About = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          {/* Sample image from public folder */}
-          <div className="flex justify-center mb-8">
-            <img src="/vite.svg" alt="Sample Logo" className="w-32 h-32 rounded-full shadow-lg" />
-          </div>
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl mb-4">
             About <span className="text-indigo-600">Career AI</span>
           </h1>
