@@ -14,7 +14,7 @@ const Chatbot = () => {
   const { isSignedIn } = useAuth();
   const { user } = useUser();
   const navigate = useNavigate();
-  const url = "https://career-ai-mern.onrender.com";
+  const url = "https://career-ai-mern-oxlq.onrender.com";
 
   // Auto-scroll to bottom when messages change
   useEffect(() => {

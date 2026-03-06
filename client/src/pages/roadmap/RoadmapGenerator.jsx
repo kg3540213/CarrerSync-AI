@@ -72,7 +72,7 @@ export default function RoadmapGenerator() {
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
-  const url = "https://career-ai-mern.onrender.com";
+  const url = "https://career-ai-mern-oxlq.onrender.com";
   
 
   // Apply theme and sidebar preferences

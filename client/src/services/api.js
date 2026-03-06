@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const url = "https://career-ai-mern.onrender.com";
+const url = "https://career-ai-mern-oxlq.onrender.com";
 
 const api = axios.create({
   baseURL: url,

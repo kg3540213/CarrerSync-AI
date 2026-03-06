@@ -89,7 +89,7 @@ const DashboardContent = () => {
   const [pathways, setPathways] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [enrolledCourses, setEnrolledCourses] = useState([]);
-  const url = "https://career-ai-mern.onrender.com";
+  const url = "https://career-ai-mern-oxlq.onrender.com";
 
   const sidebarItems = [
     { id: "profile", icon: <User className="w-5 h-5" />, label: "Profile" },

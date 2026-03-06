@@ -15,7 +15,7 @@ const ResourceDetails = () => {
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [enrolledIds, setEnrolledIds] = useState([]);
-  const url = "https://career-ai-mern.onrender.com";
+  const url = "https://career-ai-mern-oxlq.onrender.com";
 
   const resource = useMemo(
     () => resources.find((r) => r.resourceId === resourceId),
