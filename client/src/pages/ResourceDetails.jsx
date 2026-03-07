@@ -15,7 +15,7 @@ const ResourceDetails = () => {
   const [isAddedToCart, setIsAddedToCart] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [enrolledIds, setEnrolledIds] = useState([]);
-  const url = "https://career-ai-mern-oxlq.onrender.com";
+  const url = "http://localhost:3001"; // Update with your backend URL if different
 
   const resource = useMemo(
     () => resources.find((r) => r.resourceId === resourceId),

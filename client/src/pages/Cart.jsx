@@ -12,7 +12,7 @@ const Cart = () => {
   const [enrolledResources, setEnrolledResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const url = "https://career-ai-mern-oxlq.onrender.com";
+  const url = "http://localhost:3001"; // Update with your backend URL if different
 
   useEffect(() => {
     const fetchCartItems = async () => {

@@ -16,7 +16,7 @@ const PathwayDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const pathway = useMemo(() => pathways.find(p => p.id === pathwayId), [pathwayId]);
-  const url = "https://career-ai-mern-oxlq.onrender.com";
+  const url = "http://localhost:3001"; // Update with your backend URL if different
 
   useEffect(() => {
     if (!pathway) {

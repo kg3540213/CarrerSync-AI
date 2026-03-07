@@ -16,7 +16,7 @@ const AllPathways = () => {
   const [filter, setFilter] = useState('all');
   const [filteredPathways, setFilteredPathways] = useState([]);
   const [subscribedPathwayIds, setSubscribedPathwayIds] = useState([]);
-  const url = "https://career-ai-mern-oxlq.onrender.com";
+  const url = "http://localhost:3001"; // Update with your backend URL if different
 
   // 🔁 Fetch subscribed pathway IDs
   useEffect(() => {

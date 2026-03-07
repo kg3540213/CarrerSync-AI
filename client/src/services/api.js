@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const url = "https://career-ai-mern-oxlq.onrender.com";
+const url = "http://localhost:3001"; // Update with your backend URL if different
 
 const api = axios.create({
   baseURL: url,

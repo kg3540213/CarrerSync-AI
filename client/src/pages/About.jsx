@@ -8,23 +8,23 @@ const About = () => {
   const teamMembers = [
     {
       id: 1,
-      name: "Amrit Raj",
+      name: "Koushik Ghosh",
       role: "Team Lead",
       bio: "Handles backend development and project coordination. Ensures smooth integration between frontend and backend.",
       image: "https://media.licdn.com/dms/image/v2/D5603AQGjrun6J6XnEA/profile-displayphoto-shrink_400_400/profile-displayphoto-shrink_400_400/0/1696413288165?e=1757548800&v=beta&t=Advuzq3N8FmLLWlPhICpLS1dY7nmd4LnEyQsXr2WX1U",
-      github: "https://www.linkedin.com/in/amrit-raj-54652b294/",
-      linkedin: "https://linkedin.com/in/amritraj",
-      email: "amritraj23@lpu.in"
+      github: "https://www.linkedin.com/in/koushik-ghosh-54652b294/",
+      linkedin: "https://linkedin.com/in/koushikghosh",
+      email: "koushik@careerai.com"
     },
     {
       id: 2,
-      name: "Harsh Kumar",
+      name: "Prince Kumar",
       role: "Frontend Developer",
       bio: "Focuses on UI/UX and React components. Implements responsive designs and user interactions.",
       image: "https://media.licdn.com/dms/image/v2/D5603AQHFrUYNyV2_Yw/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1689089288664?e=1757548800&v=beta&t=EW6CpR10wJryLvWTlxUtJpEawlfD-YuFxoLmy5br47w",
-      github: "https://github.com/harshkumar",
-      linkedin: "https://www.linkedin.com/in/harshkumar-0001-/",
-      email: "harsh@careerai.com"
+      github: "https://github.com/princekumar",
+      linkedin: "https://www.linkedin.com/in/princekumar-0001-/",
+      email: "prince@careerai.com"
     },
     {
       id: 3,

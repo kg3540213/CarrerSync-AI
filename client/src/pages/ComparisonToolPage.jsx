@@ -13,7 +13,7 @@ const ComparisonToolPage = () => {
   const { user } = useUser(); 
   const pdfRef = useRef(null);
   const navigate = useNavigate();
-  const url = "https://career-ai-mern-oxlq.onrender.com";
+  const url = "http://localhost:3001"; // Update with your backend URL if different
 
   // Sample career data with more detailed information
   const allCareers = [
