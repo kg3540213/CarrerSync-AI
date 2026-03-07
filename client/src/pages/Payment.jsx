@@ -18,7 +18,7 @@ const Payment = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [activeCard, setActiveCard] = useState('visa');
   const [showConfirm, setShowConfirm] = useState(false);
-  const url = "http://localhost:3001"; // Update with your backend URL if different
+  const url = "https://carrer-ai-mken.onrender.com"; // Update with your backend URL if different
 
   const navigate = useNavigate();
 

@@ -9,7 +9,7 @@ import { pathways } from '../../assets/pathwaysData';
 
 const AdminDashboardContent = () => {
   const navigate = useNavigate();
-  const url = "http://localhost:3001"; // Update with your backend URL if different
+  const url = "https://carrer-ai-mken.onrender.com"; // Update with your backend URL if different
   const [activeSection, setActiveSection] = useState(() => {
     // Get last active section from localStorage
     return localStorage.getItem('adminActiveSection') || 'profile';

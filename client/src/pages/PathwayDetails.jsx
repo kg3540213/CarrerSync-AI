@@ -16,7 +16,7 @@ const PathwayDetails = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const pathway = useMemo(() => pathways.find(p => p.id === pathwayId), [pathwayId]);
-  const url = "http://localhost:3001"; // Update with your backend URL if different
+  const url = "https://carrer-ai-mken.onrender.com"; // Update with your backend URL if different
 
   useEffect(() => {
     if (!pathway) {

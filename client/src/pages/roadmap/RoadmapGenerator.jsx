@@ -72,7 +72,7 @@ export default function RoadmapGenerator() {
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
   const searchInputRef = useRef(null);
-  const url = "http://localhost:3001"; // Update with your backend URL if different
+  const url = "https://carrer-ai-mken.onrender.com"; // Update with your backend URL if different
   
 
   // Apply theme and sidebar preferences

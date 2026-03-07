@@ -27,7 +27,7 @@ const AllResources = () => {
   const [filteredResources, setFilteredResources] = useState([]);
   const [enrolledIds, setEnrolledIds] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
-  const url = "http://localhost:3001"; // Update with your backend URL if different
+  const url = "https://carrer-ai-mken.onrender.com"; // Update with your backend URL if different
 
   useEffect(() => {
     const fetchEnrolled = async () => {
