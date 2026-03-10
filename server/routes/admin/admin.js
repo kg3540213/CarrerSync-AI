@@ -1,8 +1,10 @@
+
 const express = require('express');
 const router = express.Router();
 const { Clerk } = require('@clerk/clerk-sdk-node');
 
 const clerk = Clerk({ apiKey: process.env.CLERK_SECRET_KEY });
+
 
 // GET /api/admin/active-users
 router.get('/active-users', async (req, res) => {

@@ -15,6 +15,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // ✅ Toggle course enrollment (add/remove from cart)
+// Toggle course enrollment (add/remove from cart)
 router.post("/course-toggle", async (req, res) => {
   try {
     const { userEmail, resourceId, addedToCart } = req.body;

@@ -17,7 +17,7 @@ const Navbar = () => {
   const { openSignIn } = useClerk();
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
-  const url = "https://career-ai-mern-oxlq.onrender.com";
+  const url = "https://carrer-ai-mken.onrender.com";
 
  const fetchCartCount = async () => {
   if (user?.primaryEmailAddress?.emailAddress) {

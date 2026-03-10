@@ -1,6 +1,23 @@
 # CareerSync-AI
-
 CareerSync-AI is a comprehensive platform designed to help users explore, compare, and plan their career pathways. It provides personalized recommendations, industry insights, skill development resources, and interactive tools for both learners and administrators.
+
+
+## Recent Updates & Improvements
+
+This project has seen several important enhancements and new features:
+
+- **AI Chatbot Integration:** The chatbot now provides instant answers and guidance, leveraging advanced AI for personalized support. Navigation commands are supported for seamless user experience.
+- **Roadmap Generator (Gemini API):** Users can generate personalized learning and career roadmaps using the Gemini API, with results stored in MongoDB for tracking and retrieval.
+- **Course Enrollment Logic:** Improved backend logic for course enrollment and cart management, including robust error handling and toggling enrollment status.
+- **Career Assessment Test:** Expanded and refined predefined questions for the career test, offering more accurate recommendations.
+- **Admin Tools:** Enhanced admin dashboard for secure management of courses, resources, and pathway content.
+- **Frontend Enhancements:** UI improvements across components (CareerPathways, ComparisonTool, ResourceCard, etc.) for better usability and visual appeal.
+- **Industry Trends & Skill Hub:** Updated content and resources to reflect the latest industry insights and skill development opportunities.
+- **Error Handling:** Improved error boundaries and feedback for both client and server operations.
+- **Code Quality:** Updated ESLint configuration and refactored code for maintainability.
+
+These updates make CareerSync-AI a more robust, user-friendly, and feature-rich platform for career planning and development.
+
 ## Features
 
 - **Career Pathways Explorer:** Browse and compare various career paths with detailed information and visualizations.
