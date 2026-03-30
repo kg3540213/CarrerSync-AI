@@ -7,27 +7,27 @@ import {
   ShoppingCart,
   TicketPlus,
   XIcon,
+  LogOut,
 } from 'lucide-react';
-import { useClerk, UserButton, useUser } from '@clerk/clerk-react';
+import { useAuth } from '../context/AuthContext';
 import { toast } from 'sonner';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const { user } = useUser();
-  const { openSignIn } = useClerk();
+  const { user, isSignedIn, logout } = useAuth();
   const navigate = useNavigate();
   const [cartCount, setCartCount] = useState(0);
   const url = "https://carrer-ai-mken.onrender.com";
 
  const fetchCartCount = async () => {
-  if (user?.primaryEmailAddress?.emailAddress) {
+  if (user?.email) {
     try {
       const res = await fetch(`${url}/api/course/count`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userEmail: user.primaryEmailAddress.emailAddress }),
+        body: JSON.stringify({ userEmail: user.email }),
       });
       const data = await res.json();
       if (typeof data.count === 'number') {
@@ -42,9 +42,16 @@ const Navbar = () => {
 
   useEffect(() => {
     fetchCartCount();
-    const interval = setInterval(fetchCartCount, 100); // poll every 2s for live update
+    const interval = setInterval(fetchCartCount, 100);
     return () => clearInterval(interval);
   }, [user]);
+
+  const handleLogout = () => {
+    logout();
+    toast.success('Logged out successfully');
+    navigate('/');
+    setIsOpen(false);
+  };
 
   return (
     <div className='fixed top-0 left-0 z-[9999] w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-5'>
@@ -76,8 +83,6 @@ const Navbar = () => {
 
         <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to='/comparison-tool-page'>Career Tool</Link>
 
-
-        
         <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to='/roadmap'>Roadmap AI</Link>
 
       </div>
@@ -86,13 +91,13 @@ const Navbar = () => {
 
         <div className='relative cursor-pointer'
         onClick={() => {
-          if (!user) {
+          if (!isSignedIn) {
           toast('Please Login to navigate', {
           duration: 1000,
           style: {
-          backgroundColor: '#dcfce7', // light green
-          color: '#166534',           // dark green text
-          border: '1px solid #86efac', // green border
+          backgroundColor: '#dcfce7',
+          color: '#166534',
+          border: '1px solid #86efac',
         },
         });
          } else {
@@ -108,23 +113,36 @@ const Navbar = () => {
             )}
         </div>
 
-        {!user ? (
+        {!isSignedIn ? (
           <button
-            onClick={openSignIn}
+            onClick={() => navigate('/login')}
             className='px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer'
           >
             Login
           </button>
         ) : (
-          <UserButton>
-            <UserButton.MenuItems>
-              <UserButton.Action
-                label='Dashboard'
-                labelIcon={<TicketPlus width={15} />}
-                onClick={() => {navigate('/my-dashboard'); scrollTo(0, 0)}}
-              />
-            </UserButton.MenuItems>
-          </UserButton>
+          <div className="relative group">
+            <button className='px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer'>
+              {user?.firstName || 'Account'}
+            </button>
+            <div className="absolute right-0 mt-0 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <Link 
+                to='/my-dashboard'
+                onClick={() => setIsOpen(false)}
+                className='flex items-center gap-2 px-4 py-3 text-gray-300 hover:bg-gray-800 transition-colors'
+              >
+                <TicketPlus width={15} />
+                Dashboard
+              </Link>
+              <button
+                onClick={handleLogout}
+                className='w-full flex items-center gap-2 px-4 py-3 text-gray-300 hover:bg-gray-800 transition-colors border-t border-gray-700'
+              >
+                <LogOut width={15} />
+                Logout
+              </button>
+            </div>
+          </div>
         )}
       </div>
 

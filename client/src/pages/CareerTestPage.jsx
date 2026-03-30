@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import preDefinedQuestions from '../assets/carrier-test/preDefinedQuestions';
-import { useUser } from '@clerk/clerk-react';
-import { GoogleGenerativeAI } from "@google/generative-ai"; // ✅ Correct import
+import { useUser } from '../context/AuthContext';
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
 export default function CareerTestPage() {
   const [step, setStep] = useState('select');

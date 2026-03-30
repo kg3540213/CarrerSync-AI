@@ -5,7 +5,7 @@ import { ArrowLeft, ShoppingCart, Check, Loader2, Star, Clock, BookOpen, ArrowRi
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { ResourceCard } from '../components/ResourceCard';
-import { useUser, SignInButton } from '@clerk/clerk-react';
+import { useUser } from '../context/AuthContext';
 import BlurCircle from '../components/BlurCircle';
 
 const ResourceDetails = () => {
@@ -230,16 +230,13 @@ const ResourceDetails = () => {
                       )}
                     </motion.button>
                   ) : (
-                    <SignInButton mode="modal" afterSignInUrl={`/resources/${resourceId}`}>
-                      <motion.button
-                        whileHover={{ scale: 1.03 }}
-                        whileTap={{ scale: 0.97 }}
-                        className="w-full py-3 px-4 rounded-lg font-medium bg-gradient-to-r from-primary to-indigo-600 hover:from-primary-dull hover:to-indigo-700 text-white flex items-center justify-center"
-                      >
-                        <ShoppingCart className="h-5 w-5 mr-2" />
-                        Login to Enroll
-                      </motion.button>
-                    </SignInButton>
+                    <button
+                      onClick={() => navigate('/login')}
+                      className="w-full py-3 px-4 rounded-lg font-medium bg-gradient-to-r from-primary to-indigo-600 hover:from-primary-dull hover:to-indigo-700 text-white flex items-center justify-center"
+                    >
+                      <ShoppingCart className="h-5 w-5 mr-2" />
+                      Login to Enroll
+                    </button>
                   )}
                 </div>
               </div>

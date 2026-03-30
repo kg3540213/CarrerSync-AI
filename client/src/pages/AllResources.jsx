@@ -5,7 +5,7 @@ import { Search, Filter, X, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ResourceCard } from '../components/ResourceCard';
 import { resources } from '../assets/resources';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useAuth } from '../context/AuthContext';
 import BlurCircle from '../components/BlurCircle';
 
 const categories = [
@@ -20,8 +20,7 @@ const categories = [
 
 const AllResources = () => {
   const navigate = useNavigate();
-  const { isLoaded, isSignedIn, user } = useUser();
-  const { openSignIn } = useClerk();
+  const { isLoaded, isSignedIn, user } = useAuth();
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
   const [filteredResources, setFilteredResources] = useState([]);
@@ -36,7 +35,7 @@ const AllResources = () => {
         const res = await fetch(`${url}/api/course/enrolled-ids`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userEmail: user?.primaryEmailAddress?.emailAddress })
+          body: JSON.stringify({ userEmail: user?.email })
         });
         const data = await res.json();
         if (res.ok) setEnrolledIds(data.enrolledIds || []);
@@ -47,7 +46,7 @@ const AllResources = () => {
       }
     };
 
-    if (isSignedIn && user?.primaryEmailAddress?.emailAddress) fetchEnrolled();
+    if (isSignedIn && user?.email) fetchEnrolled();
   }, [isSignedIn, user]);
 
   useEffect(() => {
@@ -127,7 +126,7 @@ const AllResources = () => {
                 You need to be logged in to view our learning resources
               </p>
               <button
-                onClick={() => openSignIn()}
+                onClick={() => navigate('/login')}
                 className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 Sign In

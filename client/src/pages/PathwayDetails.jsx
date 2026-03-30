@@ -5,7 +5,7 @@ import { CheckCircle } from 'lucide-react';
 import { Toaster, toast } from 'sonner';
 import { pathways } from '../assets/pathwaysData';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { useUser, SignInButton } from '@clerk/clerk-react';
+import { useUser } from '../context/AuthContext';
 import BlurCircle from '../components/BlurCircle';
 
 const PathwayDetails = () => {
@@ -199,14 +199,13 @@ const PathwayStats = ({ growth, salary }) => (
 const SubscriptionButton = ({ isSignedIn, status, loading, onClick, pathwayId }) => {
   if (!isSignedIn) {
     return (
-      <SignInButton mode="modal" afterSignInUrl={`/pathways/${pathwayId}`}>
-        <button
-          className="px-6 py-3 rounded-lg font-medium transition-colors bg-primary hover:bg-primary-dull text-white"
-          aria-label="Sign in to subscribe"
-        >
-          Sign In to Subscribe
-        </button>
-      </SignInButton>
+      <button
+        onClick={() => navigate('/login')}
+        className="px-6 py-3 rounded-lg font-medium transition-colors bg-primary hover:bg-primary-dull text-white"
+        aria-label="Sign in to subscribe"
+      >
+        Sign In to Subscribe
+      </button>
     );
   }
 

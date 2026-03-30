@@ -1,6 +1,6 @@
 // 📁 src/pages/roadmap/Roadmap.jsx
 import { useState, useEffect, useRef } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from "../../context/AuthContext";
 import { Link } from "react-router-dom";
 import {
   SidebarIcon,

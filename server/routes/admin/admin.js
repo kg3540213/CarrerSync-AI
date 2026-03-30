@@ -1,19 +1,15 @@
 
 const express = require('express');
 const router = express.Router();
-const { Clerk } = require('@clerk/clerk-sdk-node');
-
-const clerk = Clerk({ apiKey: process.env.CLERK_SECRET_KEY });
-
+const User = require('../../models/User');
 
 // GET /api/admin/active-users
 router.get('/active-users', async (req, res) => {
   try {
-    const users = await clerk.users.getUserList();
-    const activeUsers = users.filter(user => !user.deletedAt); // ✅ filters out deleted accounts
-    res.json({ count: activeUsers.length });
+    const users = await User.find({}).select('email firstName lastName createdAt');
+    res.json({ count: users.length, users });
   } catch (error) {
-    console.error('Error fetching users from Clerk:', error);
+    console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useAuth, useUser } from "@clerk/clerk-react";
+import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 const Chatbot = () => {
@@ -11,8 +11,7 @@ const Chatbot = () => {
   const [isMinimized, setIsMinimized] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
-  const { isSignedIn } = useAuth();
-  const { user } = useUser();
+  const { isSignedIn, user } = useAuth();
   const navigate = useNavigate();
   const url = "https://career-ai-mern-oxlq.onrender.com";
 

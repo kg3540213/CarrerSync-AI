@@ -2,14 +2,12 @@ import React from 'react';
 import { Sparkles, Route, BrainCircuit, Rocket } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useClerk, useUser } from '@clerk/clerk-react';
+import { useAuth } from '../../context/AuthContext';
 import BlurCircle from '../BlurCircle';
 
 const RoadmapGeneratorBanner = () => {
   const navigate = useNavigate();
-  const { isSignedIn } = useUser();
-  const { openSignIn } = useClerk();
-  const [showLoginPrompt, setShowLoginPrompt] = React.useState(false);
+  const { isSignedIn } = useAuth();
 
   const handleGeneratorClick = () => {
     if (isSignedIn) {
@@ -22,7 +20,7 @@ const RoadmapGeneratorBanner = () => {
 
   const handleLoginClick = () => {
     setShowLoginPrompt(false);
-    openSignIn();
+    navigate('/login');
   };
 
   // Animation variants

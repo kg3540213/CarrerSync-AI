@@ -8,6 +8,7 @@ const setupRoutes = require('./routes/mainRoutes');
 const adminMainRoutes = require('./routes/admin/adminMainRoute');
 const roadmapRoute = require("./routes/roadmap/roadmap");
 const chatbotRoutes = require("./routes/chatbot");
+const authRoutes = require('./routes/auth');
 
 const path = require('path');
 const app = express();
@@ -18,7 +19,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-  origin: "https://carrer-ai-mken.onrender.com",
+  origin: ["https://carrer-ai-mken.onrender.com", "http://localhost:3001"],
   credentials: true
 }));
 
@@ -30,6 +31,9 @@ app.use(express.json());
 app.get('/health', (req, res) => {
   res.send({ status: "Server is running ✅" });
 });
+
+// Authentication Routes
+app.use('/api/auth', authRoutes);
 
 // API Routes
 setupRoutes(app);

@@ -18,6 +18,8 @@ import Payment from './pages/Payment';
 import Dashboard from './pages/Dashboard';
 import About from './pages/About';
 import NotFound from './pages/NotFound';
+import Login from './pages/Login';
+import SignUp from './pages/SignUp';
 
 import AdminHome from './pages/admin/AdminHome';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -65,6 +67,8 @@ const App = () => {
 
       <Routes>
         <Route path='/' element={<Home />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/signup' element={<SignUp />} />
         <Route path='/comparison-tool-page' element={<ComparisonToolPage />} />
         <Route path='/career-test' element={<CareerTestPage />} />
         <Route path='/pathways' element={<AllPathways />} />

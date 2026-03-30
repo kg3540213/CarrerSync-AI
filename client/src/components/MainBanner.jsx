@@ -2,12 +2,11 @@ import React from 'react';
 import { ArrowRight, BrainCircuit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useClerk, useUser } from '@clerk/clerk-react';
+import { useAuth } from '../context/AuthContext';
 import BlurCircle from './BlurCircle';
 const MainBanner = () => {
   const navigate = useNavigate();
-  const { isSignedIn } = useUser();
-  const { openSignIn } = useClerk();
+  const { isSignedIn } = useAuth();
   const [showLoginPrompt, setShowLoginPrompt] = React.useState(false);
 
 const handleCareerTestClick = () => {
@@ -22,7 +21,7 @@ const handleCareerTestClick = () => {
 
   const handleLoginClick = () => {
     setShowLoginPrompt(false);
-    openSignIn();
+    navigate('/login');
   };
 
   // Animation variants

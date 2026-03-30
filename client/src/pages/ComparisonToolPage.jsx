@@ -4,7 +4,7 @@ import { X, ChevronDown, BarChart2, BookOpen, Clock, DollarSign, ArrowLeft, Down
 import * as htmlToImage from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import axios from 'axios';
-import { useUser, useSignIn } from '@clerk/clerk-react';
+import { useUser } from '../context/AuthContext';
 import { toast, Toaster } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 import BlurCircle from '../components/BlurCircle';
@@ -525,10 +525,7 @@ const ComparisonToolPage = () => {
       </motion.button>
     ) : (
       <motion.button
-        onClick={() => window.Clerk?.openSignIn({
-          afterSignInUrl: window.location.href,
-          redirectUrl: window.location.href
-        })}
+        onClick={() => navigate('/login')}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         className="px-8 py-3 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 rounded-xl font-medium flex items-center gap-3 shadow-lg"

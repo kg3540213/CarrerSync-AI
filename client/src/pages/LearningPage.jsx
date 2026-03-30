@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { resources } from '../assets/resources';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useUser } from '../context/AuthContext';
 import { FiArrowLeft, FiArrowRight, FiCheck, FiChevronRight } from 'react-icons/fi';
 import BlurCircle from '../components/BlurCircle';
 
@@ -10,12 +10,11 @@ const LearningPage = () => {
   const { resourceId } = useParams();
   const navigate = useNavigate();
   const { isSignedIn, user } = useUser();
-  const { openSignIn } = useClerk();
   const [course, setCourse] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [videoLoaded, setVideoLoaded] = useState(false);
   const [hasAccess, setHasAccess] = useState(false);
-  const url = "https://carrer-ai-mken.onrender.com"; // Update with your backend URL if different
+  const url = "https://carrer-ai-mken.onrender.com";
 
   const checkCourseAccess = useCallback(async () => {
     try {
@@ -31,7 +30,7 @@ const LearningPage = () => {
         const response = await fetch(`${url}/api/course/enrolled-ids`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userEmail: user.primaryEmailAddress.emailAddress }),
+          body: JSON.stringify({ userEmail: user.email }),
         });
 
         if (response.ok) {
@@ -51,9 +50,6 @@ const LearningPage = () => {
 
   useEffect(() => {
     checkCourseAccess();
-    const handleAuthChange = () => isSignedIn ? checkCourseAccess() : setHasAccess(false);
-    window.addEventListener('clerk:session', handleAuthChange);
-    return () => window.removeEventListener('clerk:session', handleAuthChange);
   }, [checkCourseAccess, isSignedIn]);
 
   if (isLoading) {

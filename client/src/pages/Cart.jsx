@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { toast, Toaster } from 'sonner';
 import { resources } from '../assets/resources';
@@ -16,7 +16,7 @@ const Cart = () => {
 
   useEffect(() => {
     const fetchCartItems = async () => {
-      if (!isSignedIn || !user?.primaryEmailAddress?.emailAddress) {
+      if (!isSignedIn || !user?.email) {
         toast.error('You must be logged in to view your cart.');
         navigate('/');
         return;
@@ -29,7 +29,7 @@ const Cart = () => {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            userEmail: user?.primaryEmailAddress?.emailAddress,
+            userEmail: user?.email,
           }),
         });
 
@@ -55,7 +55,7 @@ const Cart = () => {
   }, [isSignedIn, user, navigate]);
 
   const handleRemove = async (resourceId) => {
-    const userEmail = user.primaryEmailAddress.emailAddress;
+    const userEmail = user.email;
 
     try {
       const res = await fetch(`${url}/api/course-toggle`, {

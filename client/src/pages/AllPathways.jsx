@@ -5,12 +5,11 @@ import { motion } from 'framer-motion';
 import { CareerPathwayCard } from '../components/CareerPathwayCard';
 import { pathways, categories } from '../assets/pathwaysData';
 import BlurCircle from '../components/BlurCircle';
-import { useUser, useClerk } from '@clerk/clerk-react';
+import { useAuth } from '../context/AuthContext';
 
 const AllPathways = () => {
   const navigate = useNavigate();
-  const { isLoaded, isSignedIn, user } = useUser();
-  const { openSignIn } = useClerk();
+  const { isLoaded, isSignedIn, user } = useAuth();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState('all');
@@ -21,11 +20,11 @@ const AllPathways = () => {
   // 🔁 Fetch subscribed pathway IDs
   useEffect(() => {
     const fetchSubscribedPathways = async () => {
-      if (!isSignedIn || !user?.primaryEmailAddress?.emailAddress) return;
+      if (!isSignedIn || !user?.email) return;
 
       try {
         const res = await fetch(
-          `${url}/api/user-pathways?email=${user.primaryEmailAddress.emailAddress}`
+          `${url}/api/user-pathways?email=${user.email}`
         );
         const data = await res.json();
         if (res.ok && data.pathwayIds) {
@@ -119,7 +118,7 @@ const AllPathways = () => {
                 You need to be logged in to view career pathways
               </p>
               <button
-                onClick={() => openSignIn()}
+                onClick={() => navigate('/login')}
                 className="inline-flex items-center px-5 py-2.5 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary-darker text-white rounded-lg font-medium transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 Sign In

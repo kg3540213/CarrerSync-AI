@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast, Toaster } from 'sonner';
 import { Lock, CreditCard, Calendar, Shield, Loader2, ArrowLeft } from 'lucide-react';
-import { useUser } from '@clerk/clerk-react';
+import { useUser } from '../context/AuthContext';
 
 const Payment = () => {
   const { user } = useUser();
@@ -76,7 +76,7 @@ const Payment = () => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          userEmail: user.primaryEmailAddress.emailAddress,
+          userEmail: user.email,
           totalAmount: totalAmount
         })
       });

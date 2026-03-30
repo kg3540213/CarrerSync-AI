@@ -1,11 +1,4 @@
-import {
-  useUser,
-  UserButton,
-  useClerk,
-  SignedIn,
-  SignedOut,
-  RedirectToSignIn
-} from "@clerk/clerk-react";
+import { useAuth } from "../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, Suspense, useMemo, memo } from "react";
 import {
@@ -82,8 +75,7 @@ const CourseCard = memo(({ course, navigate }) => {
 
 const DashboardContent = () => {
   
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState("profile");
   const [pathways, setPathways] = useState([]);
@@ -190,22 +182,18 @@ const DashboardContent = () => {
               </div>
             </motion.div>
             <div className="ml-3">
-              <p className="font-semibold text-white truncate max-w-[120px]">{user.fullName}</p>
+              <p className="font-semibold text-white truncate max-w-[120px]">{user?.firstName || 'User'}</p>
               <p className="text-xs text-gray-400/80 truncate max-w-[120px]">
-                {user.primaryEmailAddress.emailAddress}
+                {user?.email}
               </p>
             </div>
           </div>
-          <UserButton 
-            appearance={{
-              elements: {
-                userButtonAvatarBox: "w-8 h-8",
-                userButtonPopoverCard: "bg-gray-900 border border-gray-800/50 backdrop-blur-lg",
-                userButtonPopoverActionButtonText: "text-white",
-                userButtonPopoverActionButton: "hover:bg-gray-800/50"
-              }
-            }} 
-          />
+          <button
+            onClick={() => setActiveSection('profile')}
+            className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-xs font-bold hover:opacity-80 transition"
+          >
+            {user?.firstName?.charAt(0) || 'U'}
+          </button>
         </div>
 
         {/* Navigation Menu */}
@@ -240,7 +228,7 @@ const DashboardContent = () => {
           <motion.button
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            onClick={() => signOut(() => navigate("/"))}
+            onClick={() => { logout(); navigate("/"); }}
             className="flex items-center w-full px-4 py-3 text-gray-400 hover:bg-gray-800/30 rounded-lg transition-all"
           >
             <LogOut className="w-5 h-5 mr-3 text-rose-500" />
@@ -548,17 +536,40 @@ const DashboardLoader = () => (
   </div>
 );
 
-const Dashboard = () => (
-  <>
-    <SignedIn>
-      <Suspense fallback={<DashboardLoader />}>
-        <DashboardContent />
-      </Suspense>
-    </SignedIn>
-    <SignedOut>
-      <RedirectToSignIn />
-    </SignedOut>
-  </>
-);
+const Dashboard = () => {
+  const { isSignedIn, isLoading } = useAuth();
+  const navigate = useNavigate();
+
+  if (isLoading) {
+    return <DashboardLoader />;
+  }
+
+  if (!isSignedIn) {
+    return (
+      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center"
+        >
+          <h2 className="text-2xl font-bold text-white mb-4">Authentication Required</h2>
+          <p className="text-gray-400 mb-6">Please log in to access your dashboard</p>
+          <button
+            onClick={() => navigate('/login')}
+            className="px-6 py-3 bg-primary hover:bg-primary-dull rounded-lg font-medium text-white transition-colors"
+          >
+            Go to Login
+          </button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  return (
+    <Suspense fallback={<DashboardLoader />}>
+      <DashboardContent />
+    </Suspense>
+  );
+};
 
 export default Dashboard;
