@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-const ACCESS_SECRET = process.env.JWT_SECRET || 'access-secret-change-in-prod';
+const ACCESS_SECRET  = process.env.JWT_SECRET         || 'access-secret-change-in-prod';
 const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'refresh-secret-change-in-prod';
 
 const generateAccessToken = (userId, email, role = 'user') =>
@@ -20,4 +20,14 @@ const verifyRefreshToken = (token) => {
   catch { return null; }
 };
 
-module.exports = { generateAccessToken, generateRefreshToken, verifyAccessToken, verifyRefreshToken };
+// Legacy alias — old routes/auth.js used generateToken
+const generateToken = (userId, email, role = 'user') =>
+  generateAccessToken(userId, email, role);
+
+module.exports = {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyAccessToken,
+  verifyRefreshToken,
+  generateToken, // backward compat
+};

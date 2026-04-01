@@ -1,11 +1,23 @@
 const router = require('express').Router();
-const ctrl   = require('../controllers/authController');
+const ctrl   = require('../controllers/userController');
 const { protect } = require('../middleware/auth');
 
-router.post('/register', ctrl.register);
-router.post('/login',    ctrl.login);
-router.post('/refresh',  ctrl.refresh);
-router.get('/me',        protect, ctrl.me);
-router.post('/logout',   protect, ctrl.logout);
+router.use(protect);
+
+// ── Cart Operations ────────────────────────────────────────────────────────
+router.get('/',                  ctrl.getCart);
+router.post('/toggle',           ctrl.toggleCart);
+router.get('/count',             ctrl.getCartCount);
+router.post('/finalize-payment', ctrl.finalizePayment);
+router.get('/clear',             async (req, res) => {
+  try {
+    const user = await (require('../models/User')).findById(req.user.userId);
+    user.cartItems = [];
+    await user.save();
+    res.json({ message: 'Cart cleared', cartItems: [] });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 module.exports = router;

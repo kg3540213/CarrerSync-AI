@@ -1,12 +1,15 @@
 const router = require('express').Router();
-const ctrl   = require('../controllers/adminController');
-const { protect, requireAdmin } = require('../middleware/auth');
+const ctrl   = require('../../controllers/adminController');
+const { protect, requireAdmin } = require('../../middleware/auth');
 
 router.use(protect, requireAdmin);
 
-router.get('/stats',             ctrl.getStats);
-router.get('/users',             ctrl.getAllUsers);
-router.patch('/users/:id/role',  ctrl.updateUserRole);
-router.delete('/users/:id',      ctrl.deleteUser);
+router.get('/stats',            ctrl.getStats);
+router.get('/users',            ctrl.getAllUsers);
+router.patch('/users/:id/role', ctrl.updateUserRole);
+router.delete('/users/:id',     ctrl.deleteUser);
+
+// Active users count — used by AdminDashboard.jsx
+router.get('/active-users',     ctrl.getActiveUsers);
 
 module.exports = router;

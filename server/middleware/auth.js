@@ -1,5 +1,9 @@
 const { verifyAccessToken } = require('../utils/jwt');
 
+/**
+ * protect — verifies Bearer token and attaches req.user = { userId, email, role }
+ * Also exported as `authMiddleware` for backward compatibility with old routes/auth.js
+ */
 const protect = (req, res, next) => {
   const auth = req.headers.authorization;
   if (!auth?.startsWith('Bearer '))
@@ -12,6 +16,9 @@ const protect = (req, res, next) => {
   next();
 };
 
+// Alias for legacy routes/auth.js that imports { authMiddleware }
+const authMiddleware = protect;
+
 const requireRole = (...roles) => (req, res, next) => {
   if (!req.user) return res.status(401).json({ error: 'Unauthenticated' });
   if (!roles.includes(req.user.role))
@@ -22,4 +29,4 @@ const requireRole = (...roles) => (req, res, next) => {
 const requireAdmin = requireRole('admin');
 const requireUser  = requireRole('user', 'admin');
 
-module.exports = { protect, requireRole, requireAdmin, requireUser };
+module.exports = { protect, authMiddleware, requireRole, requireAdmin, requireUser };
