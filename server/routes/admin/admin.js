@@ -1,17 +1,12 @@
+const router = require('express').Router();
+const ctrl   = require('../controllers/adminController');
+const { protect, requireAdmin } = require('../middleware/auth');
 
-const express = require('express');
-const router = express.Router();
-const User = require('../../models/User');
+router.use(protect, requireAdmin);
 
-// GET /api/admin/active-users
-router.get('/active-users', async (req, res) => {
-  try {
-    const users = await User.find({}).select('email firstName lastName createdAt');
-    res.json({ count: users.length, users });
-  } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ error: 'Failed to fetch users' });
-  }
-});
+router.get('/stats',             ctrl.getStats);
+router.get('/users',             ctrl.getAllUsers);
+router.patch('/users/:id/role',  ctrl.updateUserRole);
+router.delete('/users/:id',      ctrl.deleteUser);
 
 module.exports = router;

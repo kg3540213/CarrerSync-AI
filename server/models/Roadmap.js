@@ -1,10 +1,9 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
-const roadmapSchema = new mongoose.Schema({
-  user_email: { type: String, required: true },
-  prompt: { type: String, required: true },
+const RoadmapSchema = new mongoose.Schema({
+  userId:  { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  prompt:  { type: String, required: true },
   roadmap: { type: String, required: true },
-  created_at: { type: Date, default: Date.now }
-});
+}, { timestamps: true });
 
-module.exports = mongoose.model("Roadmap", roadmapSchema);
+module.exports = mongoose.model('Roadmap', RoadmapSchema);

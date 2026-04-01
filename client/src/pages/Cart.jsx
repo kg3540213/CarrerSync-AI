@@ -1,205 +1,100 @@
-import React, { useEffect, useState } from 'react';
-import { useUser } from '../context/AuthContext';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast, Toaster } from 'sonner';
+import { toast } from 'sonner';
 import { resources } from '../assets/resources';
 import { motion, AnimatePresence } from 'framer-motion';
-import BlurCircle from '../components/BlurCircle';
 import { ShoppingCart, Loader2, BookOpen, ArrowRight, X, CheckCircle } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
+import { useCart } from '../hooks/useCart';
+import BlurCircle from '../components/BlurCircle';
 
 const Cart = () => {
-  const { isSignedIn, user } = useUser();
-  const [enrolledResources, setEnrolledResources] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const url = "https://carrer-ai-mken.onrender.com"; // Update with your backend URL if different
+  const { isSignedIn }                           = useAuth();
+  const { cartItems, toggle, loading, refetch }  = useCart();
+  const navigate                                 = useNavigate();
+  const [initializing, setInit]                  = useState(true);
 
   useEffect(() => {
-    const fetchCartItems = async () => {
-      if (!isSignedIn || !user?.email) {
-        toast.error('You must be logged in to view your cart.');
-        navigate('/');
-        return;
-      }
+    if (!isSignedIn) { toast.error('Please log in first'); navigate('/'); return; }
+    refetch().finally(() => setInit(false));
+  }, [isSignedIn]);
 
-      try {
-        const res = await fetch(`${url}/api/enrolled`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            userEmail: user?.email,
-          }),
-        });
+  const enrolled = resources.filter(r => cartItems.includes(r.resourceId));
 
-        const data = await res.json();
+  const total = enrolled.reduce((sum, item) => {
+    const n = parseFloat(item.price.replace(/[^\d.]/g, ''));
+    return sum + (isNaN(n) ? 0 : n);
+  }, 0);
 
-        if (res.ok && Array.isArray(data.resourceIds)) {
-          const enrolled = resources.filter((res) =>
-            data.resourceIds.includes(res.resourceId)
-          );
-          setEnrolledResources(enrolled);
-        } else {
-          toast.error('Failed to load enrolled courses.');
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error('Server error.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchCartItems();
-  }, [isSignedIn, user, navigate]);
-
-  const handleRemove = async (resourceId) => {
-    const userEmail = user.email;
-
-    try {
-      const res = await fetch(`${url}/api/course-toggle`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userEmail, resourceId, addedToCart: false })
-      });
-
-      if (res.ok) {
-        setEnrolledResources(prev => prev.filter(item => item.resourceId !== resourceId));
-        toast.success('Removed from cart');
-      } else {
-        toast.error('Failed to remove course.');
-      }
-    } catch (err) {
-      console.error(err);
-      toast.error('Server error');
-    }
+  const handleRemove = async (id) => {
+    const ok = await toggle(id, false);
+    if (ok) toast.info('Removed from cart');
+    else    toast.error('Failed to remove');
   };
 
-  const calculateTotal = () => {
-    return enrolledResources.reduce((sum, item) => {
-      const numericPrice = parseFloat(item.price.replace(/[^\d.]/g, ''));
-      return sum + (isNaN(numericPrice) ? 0 : numericPrice);
-    }, 0);
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen text-white text-center py-20 flex flex-col items-center justify-center bg-gradient-to-br from-gray-900 to-gray-950">
-        <Loader2 className="animate-spin h-12 w-12 text-primary mb-4" />
-        <p className="text-lg font-medium">Loading your learning journey...</p>
-      </div>
-    );
-  }
+  if (initializing) return (
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <Loader2 className="animate-spin w-8 h-8 text-primary" />
+    </div>
+  );
 
   return (
-    <section className="relative pt-16 md:pt-50 pb-24 bg-gradient-to-br from-gray-900 to-gray-950 px-4 sm:px-6 min-h-screen text-white overflow-hidden">
-      <BlurCircle top="-100px" left="-100px" color="purple" size="lg" />
-      <BlurCircle bottom="-100px" right="-100px" color="blue" size="lg" />
-      
-     
+    <section className="relative pt-24 md:pt-32 pb-24 bg-gray-950 px-4 sm:px-6 min-h-screen text-white">
+      <BlurCircle top="-100px" left="-100px" />
+      <BlurCircle bottom="-100px" right="-100px" />
 
-      <div className="max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="flex flex-col md:flex-row items-start md:items-center justify-between mb-12"
-        >
-          <div className="mb-6 md:mb-0">
-            <div className="flex items-center mb-3">
-              <div className="p-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 mr-4">
-                <ShoppingCart className="text-primary" size={28} />
-              </div>
-              <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-indigo-400">
-                Your Learning Cart
-              </h1>
-            </div>
-            <p className="text-gray-400 ml-16">Review and manage your selected courses</p>
-          </div>
-          {enrolledResources.length > 0 && (
-            <div className="bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3">
-              <p className="text-sm text-gray-300">
-                <span className="font-medium text-white">{enrolledResources.length}</span> course{enrolledResources.length !== 1 ? 's' : ''} selected
-              </p>
-            </div>
-          )}
+      <div className="max-w-6xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: -16 }} animate={{ opacity: 1, y: 0 }} className="mb-10">
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent flex items-center gap-3">
+            <ShoppingCart className="w-7 h-7 text-primary" /> Your Cart
+          </h1>
+          <p className="text-gray-500 mt-1">{enrolled.length} item{enrolled.length !== 1 ? 's' : ''}</p>
         </motion.div>
 
-        {enrolledResources.length === 0 ? (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-            className="text-center py-20 bg-gray-900/30 rounded-xl border border-gray-800 backdrop-blur-sm max-w-2xl mx-auto"
-          >
-            <div className="inline-flex items-center justify-center p-5 rounded-full bg-gray-800/50 border border-gray-700 mb-6">
-              <BookOpen className="h-10 w-10 text-gray-500" />
-            </div>
-            <h3 className="text-2xl font-medium mb-3">Your learning cart is empty</h3>
-            <p className="text-gray-400 mb-8 max-w-md mx-auto text-lg">
-              Explore our premium courses to start your learning journey today.
-            </p>
-            <button
-              onClick={() => {navigate('/resources'); scrollTo(0, 0)}}
-              className="px-8 py-3.5 bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-600/90 rounded-xl text-white font-medium flex items-center mx-auto transition-all hover:shadow-lg hover:shadow-primary/20"
-            >
-              Browse All Courses
-              <ArrowRight className="ml-2" size={18} />
+        {enrolled.length === 0 ? (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+            className="text-center py-24 bg-gray-900/40 rounded-2xl border border-gray-800">
+            <BookOpen className="w-12 h-12 text-gray-700 mx-auto mb-4" />
+            <h3 className="text-xl font-medium text-white mb-2">Your cart is empty</h3>
+            <p className="text-gray-500 mb-6">Discover our courses and start learning</p>
+            <button onClick={() => { navigate('/resources'); scrollTo(0, 0); }}
+              className="px-6 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-medium text-sm flex items-center gap-2 mx-auto transition-all">
+              Browse Courses <ArrowRight className="w-4 h-4" />
             </button>
           </motion.div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            {/* Items */}
             <div className="lg:col-span-2">
-              <div className="bg-gray-900/40 border border-gray-800 rounded-xl overflow-hidden backdrop-blur-sm">
-                <div className="p-5 border-b border-gray-800">
-                  <h2 className="text-xl font-semibold flex items-center">
-                    <CheckCircle className="text-emerald-400 mr-2" size={20} />
-                    Selected Courses
-                  </h2>
+              <div className="bg-gray-900/60 border border-gray-800 rounded-2xl overflow-hidden">
+                <div className="px-6 py-4 border-b border-gray-800 flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-emerald-400" />
+                  <span className="text-sm font-medium text-white">Selected Courses</span>
                 </div>
                 <div className="divide-y divide-gray-800/50">
                   <AnimatePresence>
-                    {enrolledResources.map((resource) => (
-                      <motion.div
-                        key={resource.resourceId}
-                        layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ duration: 0.3 }}
-                        className="p-5 hover:bg-gray-800/20 transition-colors"
-                      >
-                        <div className="flex flex-col sm:flex-row gap-5">
-                          <div className="flex-shrink-0 w-full sm:w-40 h-32 rounded-lg overflow-hidden">
-                            <img
-                              src={resource.image}
-                              alt={resource.name}
-                              className="w-full h-full object-cover transition-transform hover:scale-105 duration-500"
-                              onError={(e) => {
-                                e.target.src = '/course-fallback.jpg';
-                                e.target.className = 'w-full h-full object-contain bg-gray-800 p-4';
-                              }}
-                            />
+                    {enrolled.map(r => (
+                      <motion.div key={r.resourceId} layout
+                        initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
+                        className="p-5 flex flex-col sm:flex-row gap-4 hover:bg-gray-800/20 transition-colors">
+                        <div className="w-full sm:w-36 h-28 rounded-xl overflow-hidden flex-shrink-0">
+                          <img src={r.image} alt={r.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex justify-between items-start gap-2">
+                            <div>
+                              <p className="font-semibold text-white text-sm leading-snug mb-1">{r.name}</p>
+                              <p className="text-xs text-gray-500 line-clamp-2">{r.description}</p>
+                            </div>
+                            <button onClick={() => handleRemove(r.resourceId)} disabled={loading}
+                              className="p-1.5 rounded-lg bg-gray-800 hover:bg-red-900/30 text-gray-400 hover:text-red-400 transition-colors flex-shrink-0">
+                              <X className="w-4 h-4" />
+                            </button>
                           </div>
-                          <div className="flex-grow">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 className="text-lg font-semibold mb-1">{resource.name}</h3>
-                                <p className="text-gray-400 text-sm mb-3 line-clamp-2">{resource.description}</p>
-                              </div>
-                              <button
-                                onClick={() => handleRemove(resource.resourceId)}
-                                className="p-2 rounded-full bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 transition-colors"
-                                aria-label="Remove course"
-                              >
-                                <X size={18} />
-                              </button>
-                            </div>
-                            <div className="flex justify-between items-center mt-4">
-                              <span className="text-lg font-bold text-primary">{resource.price}</span>
-                              <span className="text-sm text-gray-400">Lifetime access</span>
-                            </div>
+                          <div className="flex justify-between items-center mt-4">
+                            <span className="text-base font-bold text-primary">{r.price}</span>
+                            <span className="text-xs text-gray-600">Lifetime access</span>
                           </div>
                         </div>
                       </motion.div>
@@ -209,53 +104,30 @@ const Cart = () => {
               </div>
             </div>
 
-            <div className="lg:col-span-1">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="bg-gray-900/50 border border-gray-800 rounded-xl p-6 backdrop-blur-sm sticky top-6"
-              >
-                <h3 className="text-xl font-semibold mb-6 pb-4 border-b border-gray-800 flex items-center">
-                  <ShoppingCart className="mr-3 text-primary" size={22} />
-                  Order Summary
+            {/* Summary */}
+            <div>
+              <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+                className="bg-gray-900/60 border border-gray-800 rounded-2xl p-6 sticky top-24">
+                <h3 className="font-semibold text-white mb-5 flex items-center gap-2">
+                  <ShoppingCart className="w-4 h-4 text-primary" /> Order Summary
                 </h3>
-                
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Subtotal</span>
-                    <span className="font-medium">${calculateTotal().toFixed(2)}</span>
+                <div className="space-y-3 mb-5 text-sm">
+                  <div className="flex justify-between text-gray-400">
+                    <span>Subtotal</span><span className="text-white">${total.toFixed(2)}</span>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-400">Discount</span>
-                    <span className="text-emerald-400">$0.00</span>
+                  <div className="flex justify-between text-gray-400">
+                    <span>Discount</span><span className="text-emerald-400">$0.00</span>
                   </div>
-                  <div className="flex justify-between text-lg pt-4 border-t border-gray-800">
-                    <span className="font-medium">Total</span>
-                    <span className="font-bold text-primary">${calculateTotal().toFixed(2)}</span>
+                  <div className="flex justify-between text-base font-bold pt-3 border-t border-gray-800">
+                    <span className="text-white">Total</span>
+                    <span className="text-primary">${total.toFixed(2)}</span>
                   </div>
                 </div>
-
-                <button
-                  onClick={() => navigate('/cart/payment', { state: { totalAmount: calculateTotal() } })}
-                  className="w-full mt-2 px-6 py-4 bg-gradient-to-r from-primary to-indigo-600 hover:from-primary/90 hover:to-indigo-600/90 text-white rounded-xl text-lg font-semibold flex items-center justify-center transition-all hover:shadow-lg hover:shadow-primary/20"
-                >
-                  Secure Checkout
-                  <ArrowRight className="ml-2" size={20} />
+                <button onClick={() => navigate('/cart/payment', { state: { totalAmount: total } })}
+                  className="w-full py-3.5 bg-gradient-to-r from-primary to-rose-500 hover:from-primary/90 hover:to-rose-600 text-white rounded-xl font-semibold text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20">
+                  Secure Checkout <ArrowRight className="w-4 h-4" />
                 </button>
-
-                <div className="mt-6 pt-6 border-t border-gray-800">
-                  <div className="flex items-start">
-                    <div className="flex-shrink-0 mt-1">
-                      <svg className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-                      </svg>
-                    </div>
-                    <p className="ml-3 text-sm text-gray-400">
-                      Secure payment processing. Your information is encrypted and protected.
-                    </p>
-                  </div>
-                </div>
+                <p className="text-xs text-gray-600 text-center mt-4">🔒 256-bit SSL encrypted payment</p>
               </motion.div>
             </div>
           </div>

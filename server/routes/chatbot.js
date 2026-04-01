@@ -1,86 +1,69 @@
-const express = require("express");
-const router = express.Router();
-const { GoogleGenerativeAI } = require("@google/generative-ai");
-require("dotenv").config();
+const express = require('express');
+const router  = express.Router();
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+require('dotenv').config();
 
-// ✅ Initialize Gemini with your API key
-const genAI = new GoogleGenerativeAI({
-  apiKey: process.env.GEMINI_API_KEY,
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
-// ✅ POST route for chatbot
-router.post("/chat", async (req, res) => {
-  const { message } = req.body;
+const SYSTEM_PROMPT = `
+You are the official AI assistant for CareerSync AI — a comprehensive career development platform.
 
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+PLATFORM FEATURES:
+- Career Assessment (AI-powered aptitude test with personalized recommendations)
+- Learning Pathways (curated roadmaps for different careers)
+- Career Comparison Tool (compare salaries, growth, skills side-by-side)
+- Resources Library (courses, tutorials, certifications)
+- AI Roadmap Generator (personalized step-by-step career plans)
+- Industry Trends (real-time market data and insights)
+- User Dashboard (progress tracking, enrolled courses, subscribed paths)
 
-    // System prompt (AI role and instructions)
-    const systemPrompt = `
-You are the official assistant for the Career AI website, a comprehensive career development platform.
+NAVIGATION: When user asks to go to a page, respond with ONLY valid JSON:
+{ "navigation": "/path" }
 
-# ABOUT CAREER AI:
-Career AI helps users discover, plan, and achieve their career goals through AI-powered tools and personalized guidance.
+Valid paths:
+/           → home
+/about      → about
+/pathways   → career pathways
+/resources  → learning resources
+/comparison-tool-page → career comparison
+/roadmap    → roadmap overview
+/roadmap-generator → AI roadmap generator
+/career-test → career assessment test
+/my-dashboard → user dashboard
 
-## Key Features:
-- Career Assessment: AI-powered aptitude test with personalized recommendations
-- Learning Pathways: Curated roadmaps for different careers
-- Comparison Tool: Compare different career options
-- Resources Library: Collection of learning materials and courses
-- Career Roadmap: Visualize and plan your progression
-- Dashboard: Track your progress, saved content, and achievements
+ANSWER FORMAT: For all other queries respond with ONLY valid JSON:
+{ "answer": "your helpful response here" }
 
-## NAVIGATION COMMANDS:
-Respond with the appropriate JSON if the user asks to navigate:
-- Home page → { "navigation": "/" }
-- About page → { "navigation": "/about" }
-- Learning Pathways → { "navigation": "/pathways" }
-- Resources → { "navigation": "/resources" }
-- Comparison Tool → { "navigation": "/comparison-tool-page" }
-- Career Roadmap → { "navigation": "/roadmap" }
-- Career Test → { "navigation": "/career-test" }
-- My Dashboard → { "navigation": "/my-dashboard" }
-
-## RESPONSE RULES:
-1. Only answer questions about Career AI or career guidance.
-2. For unrelated questions, reply with:
-   { "answer": "I specialize in career guidance and the Career AI platform. How can I help you with your career development?" }
-3. Always return **valid JSON** in one of these formats:
-   - { "answer": "Your helpful response here" }
-   - { "navigation": "/path" }
+RULES:
+1. Only answer questions about CareerSync AI or career guidance topics.
+2. For off-topic questions: { "answer": "I specialize in career guidance and CareerSync AI. How can I help with your career development?" }
+3. Always return valid, parseable JSON — no markdown, no code fences.
+4. Be concise, helpful, and encouraging.
 `;
 
-    // ✅ Proper format for v0.24.1
+router.post('/chat', async (req, res) => {
+  const { message } = req.body;
+  if (!message?.trim()) return res.status(400).json({ error: 'Message required' });
+
+  try {
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+
     const result = await model.generateContent({
-      contents: [
-        {
-          role: "user",
-          parts: [
-            { text: `${systemPrompt}\n\nUser: ${message}` }
-          ],
-        },
-      ],
+      contents: [{ role: 'user', parts: [{ text: `${SYSTEM_PROMPT}\n\nUser message: ${message}` }] }],
+      generationConfig: { maxOutputTokens: 512, temperature: 0.7 },
     });
 
-    // ✅ Extract model response
-    const text = result.response.text();
-    const cleaned = text.replace(/```json|```/g, "").trim();
+    const text    = result.response.text().trim();
+    const cleaned = text.replace(/```json|```/g, '').trim();
 
-    // ✅ Ensure JSON-safe output
     let parsed;
-    try {
-      parsed = JSON.parse(cleaned);
-    } catch {
-      parsed = { answer: cleaned };
-    }
+    try { parsed = JSON.parse(cleaned); }
+    catch { parsed = { answer: cleaned }; }
 
     res.json(parsed);
-  } catch (error) {
-    console.error("Gemini Chatbot Error:", error);
-    res.status(500).json({
-      error:
-        "I'm experiencing technical difficulties. Please try again shortly.",
-    });
+  } catch (e) {
+    console.error('Chatbot error:', e.message);
+    res.status(500).json({ answer: 'I\'m having trouble right now. Please try again shortly.' });
   }
 });
 

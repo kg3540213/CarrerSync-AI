@@ -83,8 +83,7 @@ router.post('/login', async (req, res) => {
         id: user._id,
         email: user.email,
         firstName: user.firstName,
-        lastName: user.lastName,
-        profileImageUrl: user.profileImageUrl
+        lastName: user.lastName
       }
     });
   } catch (error) {
@@ -107,33 +106,12 @@ router.get('/me', authMiddleware, async (req, res) => {
         id: user._id,
         email: user.email,
         firstName: user.firstName,
-        lastName: user.lastName,
-        profileImageUrl: user.profileImageUrl
+        lastName: user.lastName
       }
     });
   } catch (error) {
     console.error('Get user error:', error);
     res.status(500).json({ error: 'Failed to fetch user' });
-  }
-});
-
-// Refresh token endpoint (optional but recommended)
-router.post('/refresh-token', authMiddleware, async (req, res) => {
-  try {
-    const user = await User.findById(req.user.userId);
-    
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-
-    const newToken = generateToken(user._id, user.email);
-
-    res.status(200).json({
-      token: newToken
-    });
-  } catch (error) {
-    console.error('Refresh token error:', error);
-    res.status(500).json({ error: 'Failed to refresh token' });
   }
 });
 

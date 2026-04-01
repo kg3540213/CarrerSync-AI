@@ -1,174 +1,96 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { jwtDecode } from 'jwt-decode';
+import { authAPI } from '../services/api';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [token, setToken] = useState(null);
+  const [user,      setUser]      = useState(null);
+  const [isSignedIn, setSignedIn] = useState(false);
+  const [isLoading,  setLoading]  = useState(true);
 
-  // Initialize auth state from localStorage
-  useEffect(() => {
-    const storedToken = localStorage.getItem('authToken');
-    if (storedToken) {
-      try {
-        const decoded = jwtDecode(storedToken);
-        // Check if token is expired
-        if (decoded.exp * 1000 > Date.now()) {
-          setToken(storedToken);
-          setIsSignedIn(true);
-          // Fetch full user data
-          fetchUserData(storedToken);
-        } else {
-          // Token expired, clear it
-          localStorage.removeItem('authToken');
-          setIsSignedIn(false);
-        }
-      } catch (error) {
-        console.error('Error decoding token:', error);
-        localStorage.removeItem('authToken');
-        setIsSignedIn(false);
-      }
+  const applyTokens = useCallback(async (accessToken, refreshToken) => {
+    try {
+      const decoded = jwtDecode(accessToken);
+      if (decoded.exp * 1000 < Date.now()) throw new Error('expired');
+      localStorage.setItem('accessToken',  accessToken);
+      if (refreshToken) localStorage.setItem('refreshToken', refreshToken);
+      const { data } = await authAPI.me();
+      setUser(data.user);
+      setSignedIn(true);
+    } catch {
+      clearAuth();
     }
-    setIsLoading(false);
   }, []);
 
-  const fetchUserData = async (authToken) => {
-    try {
-      const response = await fetch('https://carrer-ai-mken.onrender.com/api/auth/me', {
-        headers: {
-          'Authorization': `Bearer ${authToken}`
-        }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.user);
-      }
-    } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
+  const clearAuth = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
+    setUser(null);
+    setSignedIn(false);
   };
+
+  // Restore session on mount
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      applyTokens(token, localStorage.getItem('refreshToken'))
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, [applyTokens]);
 
   const register = async (email, password, firstName, lastName) => {
     try {
-      const response = await fetch('https://carrer-ai-mken.onrender.com/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password, firstName, lastName })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('authToken', data.token);
-        setToken(data.token);
-        setUser(data.user);
-        setIsSignedIn(true);
-        return { success: true, data };
-      } else {
-        return { success: false, error: data.error || 'Registration failed' };
-      }
-    } catch (error) {
-      console.error('Registration error:', error);
-      return { success: false, error: 'Registration failed' };
+      const { data } = await authAPI.register({ email, password, firstName, lastName });
+      await applyTokens(data.token, data.refreshToken);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.response?.data?.error || 'Registration failed' };
     }
   };
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('https://carrer-ai-mken.onrender.com/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ email, password })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('authToken', data.token);
-        setToken(data.token);
-        setUser(data.user);
-        setIsSignedIn(true);
-        return { success: true, data };
-      } else {
-        return { success: false, error: data.error || 'Login failed' };
-      }
-    } catch (error) {
-      console.error('Login error:', error);
-      return { success: false, error: 'Login failed' };
+      const { data } = await authAPI.login({ email, password });
+      await applyTokens(data.token, data.refreshToken);
+      return { success: true };
+    } catch (e) {
+      return { success: false, error: e.response?.data?.error || 'Login failed' };
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('authToken');
-    setToken(null);
-    setUser(null);
-    setIsSignedIn(false);
+  const logout = async () => {
+    try { await authAPI.logout(); } catch {}
+    clearAuth();
   };
-
-  const signOut = logout;
 
   const value = {
     user,
     isSignedIn,
     isLoading,
-    token,
+    isLoaded: !isLoading,
     register,
     login,
     logout,
-    signOut,
-    isLoaded: !isLoading
+    signOut: logout,
+    // Clerk-compatible helpers
+    primaryEmailAddress: user ? { emailAddress: user.email } : null,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be inside AuthProvider');
+  return ctx;
 };
 
-export const useUser = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useUser must be used within an AuthProvider');
-  }
-  return {
-    user: context.user,
-    isSignedIn: context.isSignedIn,
-    isLoaded: context.isLoaded,
-    primaryEmailAddress: context.user ? { emailAddress: context.user.email } : null
-  };
-};
-
+// Clerk-compatible aliases
+export const useUser  = useAuth;
 export const useClerk = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useClerk must be used within an AuthProvider');
-  }
-  return {
-    signOut: context.logout,
-    openSignIn: () => {
-      // This will be handled by routing to login page
-      window.location.href = '/login';
-    }
-  };
-};
-
-export const useSignIn = () => {
-  return {
-    signIn: async (credentials) => {
-      // This is a placeholder for compatibility
-      return { success: false };
-    }
-  };
+  const { logout } = useAuth();
+  return { signOut: logout };
 };

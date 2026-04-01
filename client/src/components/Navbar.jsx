@@ -1,152 +1,129 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import {
-  BoxIcon,
-  MenuIcon,
-  SearchIcon,
-  ShoppingCart,
-  TicketPlus,
-  XIcon,
-  LogOut,
-} from 'lucide-react';
+import { MenuIcon, ShoppingCart, TicketPlus, XIcon, LogOut, Zap } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useCart } from '../hooks/useCart';
 import { toast } from 'sonner';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isSignedIn, logout } = useAuth();
+  const { count: cartCount } = useCart();
   const navigate = useNavigate();
-  const [cartCount, setCartCount] = useState(0);
-  const url = "https://carrer-ai-mken.onrender.com";
 
- const fetchCartCount = async () => {
-  if (user?.email) {
-    try {
-      const res = await fetch(`${url}/api/course/count`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userEmail: user.email }),
-      });
-      const data = await res.json();
-      if (typeof data.count === 'number') {
-        setCartCount(data.count);
-      }
-    } catch (err) {
-      console.error('Failed to fetch cart count:', err);
-    }
-  }
-};
-
-
-  useEffect(() => {
-    fetchCartCount();
-    const interval = setInterval(fetchCartCount, 100);
-    return () => clearInterval(interval);
-  }, [user]);
+  const close = () => setIsOpen(false);
 
   const handleLogout = () => {
     logout();
-    toast.success('Logged out successfully');
+    toast.success('Logged out');
     navigate('/');
-    setIsOpen(false);
+    close();
   };
 
+  const navLinks = [
+    { to: '/',                    label: 'Home'        },
+    { to: '/pathways',            label: 'Pathways'    },
+    { to: '/resources',           label: 'Resources'   },
+    { to: '/comparison-tool-page', label: 'Career Tool' },
+    { to: '/roadmap',             label: 'Roadmap AI'  },
+  ];
+
   return (
-    <div className='fixed top-0 left-0 z-[9999] w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-5'>
-      <Link to='/' className='max-md:flex-1 flex items-center gap-2'>
-        <div className="flex items-center">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mr-2">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="w-6 h-6">
-              <path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82Z" />
-            </svg>
-          </div>
-          <span className="text-xl max-md:hidden font-medium ">CareerAI</span>
+    <div className="fixed top-0 left-0 z-[9999] w-full flex items-center justify-between px-6 md:px-16 lg:px-36 py-5 bg-gray-950/80 backdrop-blur-md border-b border-gray-800/50">
+
+      {/* Logo */}
+      <Link to="/" onClick={close} className="flex items-center gap-2 flex-shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-primary to-pink-600 flex items-center justify-center shadow-lg">
+          <Zap className="w-4 h-4 text-white" />
         </div>
+        <span className="text-lg font-bold tracking-tight hidden sm:block">CareerAI</span>
       </Link>
 
-      <div
-        className={`max-md:absolute max-md:top-0 max-md:left-0 max-md:font-medium max-md:text-lg z-50 flex flex-col md:flex-row items-center max-md:justify-center gap-8 min-md:px-8 py-3 max-md:h-screen min-md:rounded-full backdrop-blur bg-black/70 md:bg-white/10 md:border border-gray-300/20 overflow-hidden transition-[width] duration-300 ${
-          isOpen ? 'max-md:w-full' : 'max-md:w-0'
-        }`}
-      >
-        <XIcon
-          onClick={() => setIsOpen(!isOpen)}
-          className='md:hidden text-primary hover:text-primary-dull transition-[color] duration-300 absolute top-6 right-6 w-6 h-6 cursor-pointer'
-        />
+      {/* Desktop Nav */}
+      <nav className="hidden md:flex items-center gap-1">
+        {navLinks.map(({ to, label }) => (
+          <Link key={to} to={to} onClick={() => scrollTo(0, 0)}
+            className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-gray-800/60 transition-all">
+            {label}
+          </Link>
+        ))}
+      </nav>
 
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to='/'>Home</Link>
+      {/* Right actions */}
+      <div className="flex items-center gap-3">
 
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to='/pathways'>Pathways</Link>
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to='/resources'>Resources</Link>
-
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to='/comparison-tool-page'>Career Tool</Link>
-
-        <Link onClick={() => { scrollTo(0, 0); setIsOpen(false); }} to='/roadmap'>Roadmap AI</Link>
-
-      </div>
-
-      <div className='flex items-center gap-8'>
-
-        <div className='relative cursor-pointer'
-        onClick={() => {
-          if (!isSignedIn) {
-          toast('Please Login to navigate', {
-          duration: 1000,
-          style: {
-          backgroundColor: '#dcfce7',
-          color: '#166534',
-          border: '1px solid #86efac',
-        },
-        });
-         } else {
-          navigate('/cart');
-          scrollTo(0, 0);
-        }
-      }}>
-      <ShoppingCart className='w-6 h-6' />
+        {/* Cart */}
+        <button
+          onClick={() => {
+            if (!isSignedIn) { toast('Please login first'); return; }
+            navigate('/cart'); scrollTo(0, 0);
+          }}
+          className="relative p-2 rounded-lg hover:bg-gray-800 transition-colors"
+        >
+          <ShoppingCart className="w-5 h-5 text-gray-400 hover:text-white transition-colors" />
           {cartCount > 0 && (
-            <span className='absolute -top-2 -right-2 text-xs bg-red-500 text-white w-5 h-5 flex items-center justify-center rounded-full'>
-              {cartCount}
+            <span className="absolute -top-1 -right-1 w-4 h-4 text-[10px] font-bold bg-primary text-white rounded-full flex items-center justify-center">
+              {cartCount > 9 ? '9+' : cartCount}
             </span>
-            )}
-        </div>
+          )}
+        </button>
 
+        {/* Auth */}
         {!isSignedIn ? (
-          <button
-            onClick={() => navigate('/login')}
-            className='px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer'
-          >
+          <button onClick={() => navigate('/login')}
+            className="px-4 py-2 text-sm font-medium bg-primary hover:bg-primary/90 text-white rounded-xl transition-all shadow-sm">
             Login
           </button>
         ) : (
           <div className="relative group">
-            <button className='px-4 py-1 sm:px-7 sm:py-2 bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer'>
-              {user?.firstName || 'Account'}
+            <button className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-800 hover:bg-gray-700 text-white rounded-xl transition-all border border-gray-700">
+              <div className="w-5 h-5 rounded-full bg-gradient-to-br from-primary/60 to-pink-600/60 flex items-center justify-center text-[10px] font-bold">
+                {user?.firstName?.[0]}
+              </div>
+              <span className="max-w-[80px] truncate">{user?.firstName}</span>
             </button>
-            <div className="absolute right-0 mt-0 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
-              <Link 
-                to='/my-dashboard'
-                onClick={() => setIsOpen(false)}
-                className='flex items-center gap-2 px-4 py-3 text-gray-300 hover:bg-gray-800 transition-colors'
-              >
-                <TicketPlus width={15} />
-                Dashboard
+
+            {/* Dropdown */}
+            <div className="absolute right-0 mt-1 w-52 bg-gray-900 border border-gray-800 rounded-xl shadow-2xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-800">
+                <p className="text-sm font-medium text-white truncate">{user?.firstName} {user?.lastName}</p>
+                <p className="text-xs text-gray-500 truncate">{user?.email}</p>
+              </div>
+              <Link to="/my-dashboard" onClick={close}
+                className="flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors">
+                <TicketPlus className="w-4 h-4" /> Dashboard
               </Link>
-              <button
-                onClick={handleLogout}
-                className='w-full flex items-center gap-2 px-4 py-3 text-gray-300 hover:bg-gray-800 transition-colors border-t border-gray-700'
-              >
-                <LogOut width={15} />
-                Logout
+              {user?.role === 'admin' && (
+                <Link to="/admin/dashboard" onClick={close}
+                  className="flex items-center gap-2 px-4 py-3 text-sm text-amber-400 hover:bg-gray-800 transition-colors">
+                  ⚡ Admin Panel
+                </Link>
+              )}
+              <button onClick={handleLogout}
+                className="w-full flex items-center gap-2 px-4 py-3 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors border-t border-gray-800">
+                <LogOut className="w-4 h-4" /> Logout
               </button>
             </div>
           </div>
         )}
+
+        {/* Mobile menu toggle */}
+        <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2 rounded-lg hover:bg-gray-800 transition-colors">
+          {isOpen ? <XIcon className="w-5 h-5" /> : <MenuIcon className="w-5 h-5" />}
+        </button>
       </div>
 
-      <MenuIcon onClick={() => setIsOpen(!isOpen)} className='max-md:ml-4 md:hidden w-8 h-8 cursor-pointer'/>
+      {/* Mobile drawer */}
+      {isOpen && (
+        <div className="md:hidden absolute top-full left-0 right-0 bg-gray-900 border-b border-gray-800 px-6 py-4 space-y-1">
+          {navLinks.map(({ to, label }) => (
+            <Link key={to} to={to} onClick={() => { close(); scrollTo(0, 0); }}
+              className="block px-4 py-3 text-sm text-gray-300 hover:text-white hover:bg-gray-800 rounded-xl transition-all">
+              {label}
+            </Link>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

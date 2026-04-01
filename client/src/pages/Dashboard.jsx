@@ -1,574 +1,424 @@
-import { useAuth } from "../context/AuthContext";
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, Suspense, useMemo, memo } from "react";
+import { useAuth } from '../context/AuthContext';
+import { userAPI, roadmapAPI } from '../services/api';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { resources } from '../assets/resources';
+import { pathways as allPathways } from '../assets/pathwaysData';
 import {
-  User,
-  BookOpen,
-  Map,
-  ChevronRight,
-  ChevronDown,
-  LogOut,
-  Home,
-  Loader2,
-  CheckCircle,
-  BarChart2,
-  Clock,
-  Award
-} from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
-import axios from "axios";
-import { pathways as allPathways } from "../assets/pathwaysData";
-import { resources } from "../assets/resources";
+  LayoutDashboard, BookOpen, Map, LogOut, ChevronRight,
+  Sparkles, TrendingUp, ShoppingCart, Route, User,
+  Play, Star, Clock, ArrowRight, Zap, Brain, Award,
+  Target, BarChart3, Activity
+} from 'lucide-react';
 
-// Optimized Course Card Component
-const CourseCard = memo(({ course, navigate }) => {
-  return (
-    <div className="relative rounded-xl overflow-hidden border border-gray-800 bg-gradient-to-br from-gray-900/50 to-gray-900/70 p-5 shadow-lg hover:shadow-xl transition-all duration-200 h-full">
-      {/* Course Thumbnail */}
-      <div className="overflow-hidden rounded-lg mb-4 aspect-video relative">
-        <img
-          src={course.image}
-          alt={course.name}
-          className="w-full h-full object-cover"
-          loading="lazy"
-          decoding="async"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 hover:opacity-100 transition-opacity"></div>
-      </div>
+// ── Stat Card ───────────────────────────────────────────────────────────────
+const StatCard = ({ icon: Icon, label, value, color, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 24 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay, duration: 0.4, ease: [0.23, 1, 0.32, 1] }}
+    className="relative overflow-hidden rounded-2xl bg-gray-900 border border-gray-800 p-6 group hover:border-gray-700 transition-colors"
+  >
+    <div className={`absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-gradient-to-br ${color} opacity-5`} />
+    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center mb-4 shadow-lg`}>
+      <Icon className="w-6 h-6 text-white" />
+    </div>
+    <p className="text-3xl font-bold text-white mb-1">{value}</p>
+    <p className="text-sm text-gray-500">{label}</p>
+  </motion.div>
+);
 
-      {/* Category + Price Row */}
-      <div className="flex justify-between items-center mb-3">
-        <span className="text-xs bg-rose-500/20 text-rose-400 px-2.5 py-1 rounded-full font-medium tracking-wide">
-          {course.category || "General"}
-        </span>
-        <span className="text-sm text-gray-300 font-medium bg-gray-800/50 px-2.5 py-1 rounded-md">
-          {course.price || "Free"}
-        </span>
-      </div>
-
-      {/* Course Title */}
-      <h3 className="text-lg font-bold text-white mb-4 leading-tight line-clamp-2 hover:text-rose-400 transition-colors duration-150">
-        {course.name}
-      </h3>
-
-      {/* Progress Bar */}
-      <div className="w-full bg-gray-800 rounded-full h-1.5 mb-4">
-        <div 
-          className="bg-gradient-to-r from-rose-500 to-amber-400 h-1.5 rounded-full" 
-          style={{ width: `${course.progress || 0}%` }}
-        ></div>
-      </div>
-
-      {/* CTA Button */}
-      <button 
-        className="w-full bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all duration-200 hover:shadow-lg flex items-center justify-center gap-2"
+// ── Course Card ─────────────────────────────────────────────────────────────
+const CourseCard = ({ course, navigate, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ delay, duration: 0.35 }}
+    className="group relative bg-gray-900 border border-gray-800 rounded-2xl overflow-hidden hover:border-rose-500/30 transition-all duration-300"
+  >
+    <div className="relative h-40 overflow-hidden">
+      <img src={course.image} alt={course.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent" />
+      <span className="absolute top-3 right-3 text-xs bg-black/60 backdrop-blur text-gray-300 px-2 py-1 rounded-full border border-white/10">
+        {course.price}
+      </span>
+    </div>
+    <div className="p-4">
+      <span className="text-xs text-rose-400 font-medium uppercase tracking-wider">{course.category}</span>
+      <h3 className="text-sm font-semibold text-white mt-1 mb-3 line-clamp-2 leading-snug">{course.name}</h3>
+      <button
         onClick={() => navigate(`/resources/learning-page/${course.resourceId}`)}
+        className="w-full flex items-center justify-center gap-2 py-2 rounded-xl bg-rose-600/10 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-medium border border-rose-600/20 hover:border-rose-600 transition-all duration-200"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd" />
-        </svg>
-        {course.progress > 0 ? "Continue Learning" : "Start Learning"}
+        <Play className="w-3 h-3" /> Continue Learning
       </button>
     </div>
-  );
-});
+  </motion.div>
+);
 
-const DashboardContent = () => {
-  
-  const { user, logout } = useAuth();
+// ── Pathway Card ────────────────────────────────────────────────────────────
+const PathwayCard = ({ pathway, navigate, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, x: -16 }}
+    animate={{ opacity: 1, x: 0 }}
+    transition={{ delay, duration: 0.35 }}
+    className="flex items-center gap-4 p-4 rounded-2xl bg-gray-900 border border-gray-800 hover:border-primary/30 transition-all group cursor-pointer"
+    onClick={() => navigate(`/pathways/${pathway.id}`)}
+  >
+    <div className="w-12 h-12 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+      <Route className="w-5 h-5 text-primary" />
+    </div>
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-semibold text-white truncate">{pathway.title}</p>
+      <p className="text-xs text-gray-500 mt-0.5">{pathway.growth}% growth · {pathway.salary}</p>
+    </div>
+    <ChevronRight className="w-4 h-4 text-gray-600 group-hover:text-primary transition-colors" />
+  </motion.div>
+);
+
+// ── Roadmap Item ────────────────────────────────────────────────────────────
+const RoadmapItem = ({ item, delay }) => (
+  <motion.div
+    initial={{ opacity: 0, y: 8 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay }}
+    className="p-4 rounded-xl bg-gray-800/50 border border-gray-700/50"
+  >
+    <p className="text-sm font-medium text-gray-200 line-clamp-1">{item.prompt}</p>
+    <p className="text-xs text-gray-500 mt-1">{new Date(item.createdAt).toLocaleDateString()}</p>
+  </motion.div>
+);
+
+// ── Sidebar Item ────────────────────────────────────────────────────────────
+const NavItem = ({ id, icon: Icon, label, active, onClick }) => (
+  <button
+    onClick={() => onClick(id)}
+    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+      active
+        ? 'bg-primary/10 text-primary border border-primary/20'
+        : 'text-gray-400 hover:text-white hover:bg-gray-800'
+    }`}
+  >
+    <Icon className="w-4 h-4 flex-shrink-0" />
+    {label}
+    {active && <ChevronRight className="w-3 h-3 ml-auto" />}
+  </button>
+);
+
+// ── Main Dashboard ──────────────────────────────────────────────────────────
+const Dashboard = () => {
+  const { user, logout, isSignedIn, isLoading } = useAuth();
   const navigate = useNavigate();
-  const [activeSection, setActiveSection] = useState("profile");
-  const [pathways, setPathways] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
-  const url = "https://carrer-ai-mken.onrender.com"; // Update with your backend URL if different
+  const [section, setSection]       = useState('overview');
+  const [stats,   setStats]         = useState({ enrolledCourses: 0, subscribedPaths: 0, cartItems: 0, roadmaps: 0 });
+  const [courses, setCourses]       = useState([]);
+  const [pathways, setPathways]     = useState([]);
+  const [roadmaps, setRoadmaps]     = useState([]);
+  const [loading,  setLoading_]     = useState(true);
 
-  const sidebarItems = [
-    { id: "profile", icon: <User className="w-5 h-5" />, label: "Profile" },
-    { id: "courses", icon: <BookOpen className="w-5 h-5" />, label: "My Courses" },
-    { id: "pathway", icon: <Map className="w-5 h-5" />, label: "Learning Path" }
+  useEffect(() => {
+    if (!isSignedIn && !isLoading) { navigate('/login'); return; }
+    if (!isSignedIn) return;
+    (async () => {
+      try {
+        const [dash, rm] = await Promise.all([
+          userAPI.getDashboard(),
+          roadmapAPI.history(),
+        ]);
+        setStats(dash.data.stats);
+        setCourses(resources.filter(r => dash.data.enrolledCourses.includes(r.resourceId)));
+        setPathways(allPathways.filter(p => dash.data.subscribedPaths.includes(p.id)));
+        setRoadmaps(rm.data.history.slice(0, 5));
+      } catch {}
+      finally { setLoading_(false); }
+    })();
+  }, [isSignedIn, isLoading]);
+
+  if (isLoading || loading) return (
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+        className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full" />
+    </div>
+  );
+
+  const STATS = [
+    { icon: BookOpen,   label: 'Enrolled Courses', value: stats.enrolledCourses, color: 'from-rose-500 to-pink-600',    delay: 0    },
+    { icon: Map,        label: 'Learning Paths',   value: stats.subscribedPaths, color: 'from-blue-500 to-cyan-600',    delay: 0.05 },
+    { icon: Brain,      label: 'AI Roadmaps',       value: stats.roadmaps,         color: 'from-violet-500 to-purple-600', delay: 0.1  },
+    { icon: ShoppingCart, label: 'In Cart',         value: stats.cartItems,        color: 'from-amber-500 to-orange-600', delay: 0.15 },
   ];
 
-  // Memoize the enrolled courses to prevent unnecessary re-renders
-  const memoizedCourses = useMemo(() => enrolledCourses, [enrolledCourses]);
-
-  useEffect(() => {
-    const fetchSubscribedPathways = async () => {
-      try {
-        setIsLoading(true);
-        const res = await axios.get(`${url}/api/user-pathways`, {
-          params: { email: user.primaryEmailAddress.emailAddress }
-        });
-
-        const subscribedIds = res.data.pathwayIds;
-        const matchedPathways = allPathways.filter((path) =>
-          subscribedIds.includes(path.id)
-        );
-
-        setPathways(matchedPathways);
-      } catch (error) {
-        console.error("Failed to fetch subscribed pathways:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (user) {
-      fetchSubscribedPathways();
-    }
-  }, [user]);
-
-  useEffect(() => {
-    const fetchEnrolledCourses = async () => {
-      try {
-        const res = await axios.post(`${url}/api/course/enrolled-ids`, {
-          userEmail: user.primaryEmailAddress.emailAddress,
-        });
-
-        const enrolledIds = res.data.enrolledIds || [];
-        const matchedCourses = resources.filter(resource =>
-          enrolledIds.includes(resource.resourceId)
-        );
-
-        setEnrolledCourses(matchedCourses);
-      } catch (error) {
-        console.error("Failed to fetch enrolled courses:", error);
-      }
-    };
-
-    if (user) {
-      fetchEnrolledCourses();
-    }
-  }, [user]);
+  const SIDEBAR = [
+    { id: 'overview',  icon: LayoutDashboard, label: 'Overview'  },
+    { id: 'courses',   icon: BookOpen,         label: 'My Courses' },
+    { id: 'pathways',  icon: Map,              label: 'Pathways'  },
+    { id: 'roadmaps',  icon: Brain,            label: 'Roadmaps'  },
+    { id: 'profile',   icon: User,             label: 'Profile'   },
+  ];
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-gray-900 to-gray-950 font-sans text-gray-100">
-      {/* Enhanced Glass Sidebar */}
-      <motion.aside
-        initial={{ x: -100 }}
-        animate={{ x: 0 }}
-        transition={{ type: "spring", stiffness: 300 }}
-        className="w-72 bg-gray-900/80 backdrop-blur-md shadow-2xl flex flex-col border-r border-gray-800/50"
-      >
-        {/* Logo with subtle animation */}
-        <div className="p-6 border-b border-gray-800/50">
-           <Link to='/' className='max-md:flex-1 flex items-center gap-2'>
-                  <div className="flex items-center">
-                    <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center mr-2">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" className="w-6 h-6">
-                        <path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82Z" />
-                      </svg>
-                    </div>
-                    <span className="text-xl max-md:hidden font-medium ">CareerAI</span>
-                  </div>
-              </Link>
-        </div>
+    <div className="min-h-screen bg-gray-950 flex font-sans">
 
-        {/* User Profile Section */}
-        <div className="p-6 border-b border-gray-800/50 flex items-center justify-between">
-          <div className="flex items-center">
-            <motion.div 
-              whileHover={{ scale: 1.05 }} 
-              whileTap={{ scale: 0.95 }}
-              className="relative"
-            >
-              <img
-                src={user.imageUrl}
-                alt="Profile"
-                className="w-12 h-12 rounded-full object-cover border-2 border-rose-500/50 shadow-md"
-              />
-              <div className="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-gray-900 flex items-center justify-center">
-                <div className="w-2 h-2 bg-white rounded-full"></div>
-              </div>
-            </motion.div>
-            <div className="ml-3">
-              <p className="font-semibold text-white truncate max-w-[120px]">{user?.firstName || 'User'}</p>
-              <p className="text-xs text-gray-400/80 truncate max-w-[120px]">
-                {user?.email}
-              </p>
+      {/* ── Sidebar ── */}
+      <motion.aside
+        initial={{ x: -280 }} animate={{ x: 0 }}
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+        className="w-64 bg-gray-900 border-r border-gray-800 flex flex-col fixed h-screen z-20"
+      >
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3 px-6 py-6 border-b border-gray-800">
+          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-pink-600 flex items-center justify-center">
+            <Zap className="w-4 h-4 text-white" />
+          </div>
+          <span className="font-bold text-white tracking-tight">CareerAI</span>
+        </Link>
+
+        {/* User */}
+        <div className="px-4 py-4 border-b border-gray-800">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-gray-800/60">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-primary/40 to-pink-600/40 border border-primary/30 flex items-center justify-center text-sm font-bold text-white">
+              {user?.firstName?.[0] || '?'}
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-white truncate">{user?.firstName} {user?.lastName}</p>
+              <p className="text-xs text-gray-500 truncate">{user?.role === 'admin' ? '⚡ Admin' : '👤 Member'}</p>
             </div>
           </div>
-          <button
-            onClick={() => setActiveSection('profile')}
-            className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center text-white text-xs font-bold hover:opacity-80 transition"
-          >
-            {user?.firstName?.charAt(0) || 'U'}
-          </button>
         </div>
 
-        {/* Navigation Menu */}
-        <nav className="flex flex-col p-4 space-y-1 flex-grow">
-          {sidebarItems.map((item) => (
-            <motion.button
-              key={item.id}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => setActiveSection(item.id)}
-              className={`flex items-center justify-between w-full px-4 py-3 rounded-lg transition-all ${
-                activeSection === item.id
-                  ? "bg-gradient-to-r from-rose-600/20 to-rose-500/10 text-rose-400 shadow-md"
-                  : "text-gray-400 hover:bg-gray-800/30"
-              }`}
-            >
-              <div className="flex items-center">
-                <span className="mr-3">{item.icon}</span>
-                <span className="font-medium">{item.label}</span>
-              </div>
-              {activeSection === item.id ? (
-                <ChevronDown className="w-5 h-5 text-rose-400" />
-              ) : (
-                <ChevronRight className="w-5 h-5 text-gray-500" />
-              )}
-            </motion.button>
+        {/* Nav */}
+        <nav className="flex-1 px-4 py-4 space-y-1 overflow-y-auto">
+          {SIDEBAR.map(item => (
+            <NavItem key={item.id} {...item} active={section === item.id} onClick={setSection} />
           ))}
+          {user?.role === 'admin' && (
+            <NavItem id="admin" icon={Award} label="Admin Panel" active={false} onClick={() => navigate('/admin/dashboard')} />
+          )}
         </nav>
 
-        {/* Sign Out Button */}
-        <div className="p-4 border-t border-gray-800/50">
-          <motion.button
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.98 }}
-            onClick={() => { logout(); navigate("/"); }}
-            className="flex items-center w-full px-4 py-3 text-gray-400 hover:bg-gray-800/30 rounded-lg transition-all"
+        {/* Logout */}
+        <div className="px-4 py-4 border-t border-gray-800">
+          <button
+            onClick={() => { logout(); navigate('/'); }}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-gray-400 hover:text-white hover:bg-gray-800 transition-all"
           >
-            <LogOut className="w-5 h-5 mr-3 text-rose-500" />
-            <span className="font-medium">Sign Out</span>
-          </motion.button>
+            <LogOut className="w-4 h-4" /> Sign Out
+          </button>
         </div>
       </motion.aside>
 
-      {/* Main Content Area */}
-      <main className="flex-1 p-8 overflow-y-auto">
-        <AnimatePresence mode="wait">
-          {/* Profile Section */}
-          {activeSection === "profile" && (
-            <motion.section
-              key="profile"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-800/50"
-            >
-              <div className="flex flex-col lg:flex-row gap-8">
-                {/* Profile Card */}
-                <motion.div 
-                  whileHover={{ scale: 1.01 }}
-                  className="bg-gray-900 rounded-2xl p-6 border border-gray-800/50 shadow-lg w-full lg:w-1/3"
-                >
-                  <div className="flex flex-col items-center">
-                    <motion.div 
-                      whileHover={{ scale: 1.05 }} 
-                      className="relative mb-6"
-                    >
-                      <img
-                        src={user.imageUrl}
-                        alt="Profile"
-                        className="w-32 h-32 rounded-full object-cover border-4 border-rose-500/30 shadow-xl"
-                      />
-                      <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-gray-900 flex items-center justify-center">
-                        <CheckCircle className="w-4 h-4 text-white" />
-                      </div>
-                    </motion.div>
-                    <h1 className="text-2xl font-bold text-center mb-1">
-                      {user.firstName} {user.lastName}
-                    </h1>
-                    <p className="text-gray-400 text-sm mb-6 flex items-center gap-1">
-                      <Award className="w-4 h-4 text-amber-400" />
-                      Premium Member
-                    </p>
-                    <div className="grid grid-cols-2 gap-4 w-full">
-                      <div className="bg-gray-900 p-4 rounded-xl border border-gray-800/30 text-center hover:bg-gray-800/50 transition-colors">
-                        <p className="text-sm text-gray-400 mb-1">Enrolled Courses</p>
-                        <p className="font-bold text-white text-xl">{enrolledCourses.length}</p>
-                      </div>
-                      <div className="bg-gray-900 p-4 rounded-xl border border-gray-800/30 text-center hover:bg-gray-800/50 transition-colors">
-                        <p className="text-sm text-gray-400 mb-1">Learning Paths</p>
-                        <p className="font-bold text-white text-xl">{pathways.length}</p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
+      {/* ── Main Content ── */}
+      <main className="flex-1 ml-64 overflow-y-auto">
+        <div className="max-w-6xl mx-auto px-8 py-10">
 
-                {/* Profile Details */}
-                <div className="flex-1">
-                  <h2 className="text-3xl font-bold mb-8 bg-gradient-to-r from-rose-500 to-amber-400 bg-clip-text text-transparent">
-                    Personal Dashboard
-                  </h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    {/* Account Details Card */}
-                    <div className="bg-gray-900 p-6 rounded-xl border border-gray-800/30 shadow-md hover:shadow-lg transition-shadow">
-                      <div className="flex items-center mb-4">
-                        <div className="bg-rose-500/10 p-2 rounded-lg mr-3">
-                          <User className="w-5 h-5 text-rose-400" />
-                        </div>
-                        <h3 className="font-semibold">Account Details</h3>
+          <AnimatePresence mode="wait">
+
+            {/* OVERVIEW */}
+            {section === 'overview' && (
+              <motion.div key="overview" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="mb-8">
+                  <motion.h1 initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }}
+                    className="text-3xl font-bold text-white mb-1">
+                    Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 17 ? 'afternoon' : 'evening'}, {user?.firstName} 👋
+                  </motion.h1>
+                  <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}
+                    className="text-gray-500">Here's what's happening with your career journey today.</motion.p>
+                </div>
+
+                {/* Stats */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+                  {STATS.map(s => <StatCard key={s.label} {...s} />)}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                  {/* Recent Courses */}
+                  <div className="lg:col-span-2">
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-lg font-semibold text-white">Continue Learning</h2>
+                      <button onClick={() => setSection('courses')} className="text-xs text-primary hover:text-primary/80 flex items-center gap-1">
+                        View all <ArrowRight className="w-3 h-3" />
+                      </button>
+                    </div>
+                    {courses.length === 0 ? (
+                      <div className="h-48 rounded-2xl border border-dashed border-gray-800 flex flex-col items-center justify-center text-center p-6">
+                        <BookOpen className="w-8 h-8 text-gray-700 mb-3" />
+                        <p className="text-sm text-gray-500 mb-3">No courses enrolled yet</p>
+                        <Link to="/resources" className="text-xs px-4 py-2 rounded-xl bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 transition-colors">
+                          Browse Courses
+                        </Link>
                       </div>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-xs text-gray-400/80 mb-1">Email</p>
-                          <p className="font-medium text-gray-200">{user.primaryEmailAddress.emailAddress}</p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-400/80 mb-1">Username</p>
-                          <p className="font-medium text-gray-200">{user.username || "Not set"}</p>
-                        </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-4">
+                        {courses.slice(0, 4).map((c, i) => (
+                          <CourseCard key={c.resourceId} course={c} navigate={navigate} delay={i * 0.05} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Quick Actions + Recent Roadmaps */}
+                  <div className="space-y-6">
+                    {/* Quick Actions */}
+                    <div>
+                      <h2 className="text-lg font-semibold text-white mb-4">Quick Actions</h2>
+                      <div className="space-y-2">
+                        {[
+                          { icon: Sparkles, label: 'Generate Roadmap', to: '/roadmap-generator', color: 'text-violet-400' },
+                          { icon: Target,   label: 'Take Career Test',  to: '/career-test',       color: 'text-emerald-400' },
+                          { icon: BarChart3, label: 'Compare Careers',  to: '/comparison-tool-page', color: 'text-blue-400' },
+                          { icon: Activity, label: 'Industry Trends',  to: '/#trends',            color: 'text-amber-400' },
+                        ].map(({ icon: Icon, label, to, color }) => (
+                          <Link key={label} to={to}
+                            className="flex items-center gap-3 p-3 rounded-xl bg-gray-900 border border-gray-800 hover:border-gray-700 text-sm font-medium text-gray-300 hover:text-white transition-all group">
+                            <Icon className={`w-4 h-4 ${color}`} />
+                            {label}
+                            <ChevronRight className="w-3 h-3 ml-auto text-gray-700 group-hover:text-gray-400 transition-colors" />
+                          </Link>
+                        ))}
                       </div>
                     </div>
 
-                    {/* Membership Card */}
-                    <div className="bg-gray-900 p-6 rounded-xl border border-gray-800/30 shadow-md hover:shadow-lg transition-shadow">
-                      <div className="flex items-center mb-4">
-                        <div className="bg-rose-500/10 p-2 rounded-lg mr-3">
-                          <CheckCircle className="w-5 h-5 text-rose-400" />
-                        </div>
-                        <h3 className="font-semibold">Membership</h3>
-                      </div>
-                      <div className="space-y-4">
-                        <div>
-                          <p className="text-xs text-gray-400/80 mb-1">Member Since</p>
-                          <p className="font-medium text-gray-200">
-                            {new Date(user.createdAt).toLocaleDateString('en-US', { 
-                              year: 'numeric', 
-                              month: 'long', 
-                              day: 'numeric' 
-                            })}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-xs text-gray-400/80 mb-1">Status</p>
-                          <p className="font-medium text-gray-200 flex items-center gap-1">
-                            <span className="w-2 h-2 bg-green-500 rounded-full"></span>
-                            Active
-                          </p>
+                    {/* Recent Roadmaps */}
+                    {roadmaps.length > 0 && (
+                      <div>
+                        <h2 className="text-lg font-semibold text-white mb-4">Recent Roadmaps</h2>
+                        <div className="space-y-2">
+                          {roadmaps.slice(0, 3).map((r, i) => (
+                            <RoadmapItem key={r._id} item={r} delay={i * 0.05} />
+                          ))}
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
 
-                  {/* Activity Overview */}
-                  <div className="bg-gray-900 p-6 rounded-xl border border-gray-800/30 shadow-md">
-                    <div className="flex items-center mb-4">
-                      <div className="bg-rose-500/10 p-2 rounded-lg mr-3">
-                        <BarChart2 className="w-5 h-5 text-rose-400" />
-                      </div>
-                      <h3 className="font-semibold">Learning Activity</h3>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="bg-gray-800/30 p-4 rounded-lg">
-                        <p className="text-xs text-gray-400 mb-1">Last Active</p>
-                        <p className="font-medium text-gray-200 flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          Today
-                        </p>
-                      </div>
-                      <div className="bg-gray-800/30 p-4 rounded-lg">
-                        <p className="text-xs text-gray-400 mb-1">Completion Rate</p>
-                        <p className="font-medium text-gray-200">
-                          {enrolledCourses.length > 0 
-                            ? `${Math.round(enrolledCourses.reduce((acc, course) => acc + (course.progress || 0), 0) / enrolledCourses.length)}%` 
-                            : "0%"}
-                        </p>
-                      </div>
-                    </div>
+                </div>
+              </motion.div>
+            )}
+
+            {/* COURSES */}
+            {section === 'courses' && (
+              <motion.div key="courses" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h1 className="text-3xl font-bold text-white">My Courses</h1>
+                    <p className="text-gray-500 mt-1">{courses.length} course{courses.length !== 1 ? 's' : ''} enrolled</p>
                   </div>
+                  <Link to="/resources"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors">
+                    <BookOpen className="w-4 h-4" /> Browse More
+                  </Link>
                 </div>
-              </div>
-            </motion.section>
-          )}
-
-          {/* Courses Section */}
-          {activeSection === "courses" && (
-            <motion.section
-              key="courses"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-800/50"
-            >
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                <div>
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-rose-500 to-amber-400 bg-clip-text text-transparent">
-                    My Courses
-                  </h2>
-                  <p className="text-gray-400">
-                    {enrolledCourses.length} enrolled course{enrolledCourses.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-                <button 
-                  className="flex items-center bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-lg"
-                  onClick={() => navigate('/resources')}
-                >
-                  Explore More Courses
-                </button>
-              </div>
-
-              {enrolledCourses.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="mx-auto w-24 h-24 bg-gray-900 rounded-full flex items-center justify-center mb-6 border border-gray-800/30">
-                    <BookOpen className="w-10 h-10 text-rose-500" />
+                {courses.length === 0 ? (
+                  <div className="h-64 rounded-2xl border border-dashed border-gray-800 flex flex-col items-center justify-center">
+                    <BookOpen className="w-10 h-10 text-gray-700 mb-4" />
+                    <p className="text-gray-500 mb-4">No courses enrolled yet</p>
+                    <Link to="/resources" className="px-6 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors">
+                      Explore Courses
+                    </Link>
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">No Enrolled Courses</h3>
-                  <p className="text-gray-400 mb-6 max-w-md mx-auto">
-                    You haven't enrolled in any courses yet. Browse our catalog to start learning.
-                  </p>
-                  <button
-                    className="bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-lg"
-                    onClick={() => navigate("/resources")}
-                  >
-                    Browse Courses
-                  </button>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {memoizedCourses.map((course) => (
-                    <CourseCard key={course.resourceId} course={course} navigate={navigate} />
-                  ))}
-                </div>
-              )}
-            </motion.section>
-          )}
-
-          {/* Learning Path Section */}
-          {activeSection === "pathway" && (
-            <motion.section
-              key="pathway"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.3 }}
-              className="bg-gray-900/80 backdrop-blur-sm rounded-2xl shadow-xl p-8 border border-gray-800/50"
-            >
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
-                <div>
-                  <h2 className="text-3xl font-bold bg-gradient-to-r from-rose-500 to-amber-400 bg-clip-text text-transparent">
-                    Learning Paths
-                  </h2>
-                  <p className="text-gray-400">
-                    {pathways.length} active path{pathways.length !== 1 ? 's' : ''}
-                  </p>
-                </div>
-                <button 
-                  className="flex items-center bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-lg"
-                  onClick={() => navigate('/pathways')}
-                >
-                  Explore All Paths
-                </button>
-              </div>
-
-              {isLoading ? (
-                <div className="flex justify-center items-center py-16">
-                  <Loader2 className="w-8 h-8 animate-spin text-rose-500" />
-                </div>
-              ) : pathways.length === 0 ? (
-                <div className="text-center py-16">
-                  <div className="mx-auto w-24 h-24 bg-gray-900 rounded-full flex items-center justify-center mb-6 border border-gray-800/30">
-                    <Map className="w-10 h-10 text-rose-500" />
+                ) : (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+                    {courses.map((c, i) => <CourseCard key={c.resourceId} course={c} navigate={navigate} delay={i * 0.04} />)}
                   </div>
-                  <h3 className="text-xl font-semibold mb-2">No Learning Paths Yet</h3>
-                  <p className="text-gray-400 mb-6 max-w-md mx-auto">
-                    You haven't subscribed to any learning paths yet. Explore our curated paths to start your career journey.
-                  </p>
-                  <button
-                    className="bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white px-6 py-3 rounded-lg font-medium transition-all shadow-lg"
-                    onClick={() => navigate("/pathways")}
-                  >
-                    Browse Learning Paths
-                  </button>
+                )}
+              </motion.div>
+            )}
+
+            {/* PATHWAYS */}
+            {section === 'pathways' && (
+              <motion.div key="pathways" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h1 className="text-3xl font-bold text-white">Learning Paths</h1>
+                    <p className="text-gray-500 mt-1">{pathways.length} active path{pathways.length !== 1 ? 's' : ''}</p>
+                  </div>
+                  <Link to="/pathways"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white text-sm font-medium hover:bg-primary/90 transition-colors">
+                    <Map className="w-4 h-4" /> Explore Paths
+                  </Link>
                 </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  {pathways.map((path) => (
-                    <motion.div
-                      key={path.id}
-                      whileHover={{ y: -5 }}
-                      className="bg-gray-900 border border-gray-800/50 rounded-xl p-6 hover:shadow-lg transition-all group"
-                    >
-                      <div className="flex items-start mb-4">
-                        <div className="bg-rose-500/10 p-3 rounded-lg mr-4 border border-gray-800/30">
-                          <Map className="w-6 h-6 text-rose-400" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-semibold group-hover:text-rose-400 transition-colors">
-                            {path.title}
-                          </h3>
-                          <p className="text-sm text-gray-400 line-clamp-2">{path.description}</p>
-                        </div>
-                      </div>
-                      
-                      <div className="flex justify-between items-center mt-6">
-                        <div className="flex items-center text-sm text-gray-400">
-                          <BookOpen className="w-4 h-4 mr-1" />
-                          {path.courses?.length || 0} courses
-                        </div>
-                        <button
-                          className="bg-gradient-to-r from-rose-600 to-rose-500 hover:from-rose-700 hover:to-rose-600 text-white py-2 px-4 rounded-lg transition-all text-sm font-medium shadow-sm"
-                          onClick={() => navigate(`/pathways/${path.id}`)}
-                        >
-                          View Details
-                        </button>
-                      </div>
+                {pathways.length === 0 ? (
+                  <div className="h-64 rounded-2xl border border-dashed border-gray-800 flex flex-col items-center justify-center">
+                    <Map className="w-10 h-10 text-gray-700 mb-4" />
+                    <p className="text-gray-500 mb-4">No pathways subscribed</p>
+                    <Link to="/pathways" className="px-6 py-2 rounded-xl bg-primary text-white text-sm font-medium">
+                      Browse Pathways
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {pathways.map((p, i) => <PathwayCard key={p.id} pathway={p} navigate={navigate} delay={i * 0.06} />)}
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {/* ROADMAPS */}
+            {section === 'roadmaps' && (
+              <motion.div key="roadmaps" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <div className="flex items-center justify-between mb-8">
+                  <div>
+                    <h1 className="text-3xl font-bold text-white">AI Roadmaps</h1>
+                    <p className="text-gray-500 mt-1">{roadmaps.length} generated</p>
+                  </div>
+                  <Link to="/roadmap-generator"
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors">
+                    <Sparkles className="w-4 h-4" /> Generate New
+                  </Link>
+                </div>
+                <div className="space-y-3">
+                  {roadmaps.map((r, i) => (
+                    <motion.div key={r._id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                      className="p-5 rounded-2xl bg-gray-900 border border-gray-800">
+                      <p className="text-sm font-medium text-white mb-1">{r.prompt}</p>
+                      <p className="text-xs text-gray-600">{new Date(r.createdAt).toLocaleString()}</p>
                     </motion.div>
                   ))}
+                  {roadmaps.length === 0 && (
+                    <div className="h-64 rounded-2xl border border-dashed border-gray-800 flex flex-col items-center justify-center">
+                      <Brain className="w-10 h-10 text-gray-700 mb-4" />
+                      <p className="text-gray-500 mb-4">No roadmaps generated yet</p>
+                      <Link to="/roadmap-generator" className="px-6 py-2 rounded-xl bg-violet-600 text-white text-sm font-medium">
+                        Create Your First
+                      </Link>
+                    </div>
+                  )}
                 </div>
-              )}
-            </motion.section>
-          )}
-        </AnimatePresence>
+              </motion.div>
+            )}
+
+            {/* PROFILE */}
+            {section === 'profile' && (
+              <motion.div key="profile" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+                <h1 className="text-3xl font-bold text-white mb-8">Profile</h1>
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                  {/* Card */}
+                  <div className="lg:col-span-1">
+                    <div className="p-6 rounded-2xl bg-gray-900 border border-gray-800 text-center">
+                      <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/40 to-pink-600/40 border-2 border-primary/30 flex items-center justify-center text-3xl font-bold text-white mx-auto mb-4">
+                        {user?.firstName?.[0]}{user?.lastName?.[0]}
+                      </div>
+                      <h2 className="text-xl font-bold text-white">{user?.firstName} {user?.lastName}</h2>
+                      <p className="text-gray-500 text-sm mt-1">{user?.email}</p>
+                      <span className={`inline-block mt-3 px-3 py-1 rounded-full text-xs font-medium ${user?.role === 'admin' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-primary/10 text-primary border border-primary/20'}`}>
+                        {user?.role === 'admin' ? '⚡ Admin' : '👤 Member'}
+                      </span>
+                    </div>
+                  </div>
+                  {/* Stats */}
+                  <div className="lg:col-span-2 grid grid-cols-2 gap-4 content-start">
+                    {STATS.map((s, i) => <StatCard key={s.label} {...s} delay={i * 0.05} />)}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+          </AnimatePresence>
+        </div>
       </main>
     </div>
-  );
-};
-
-const DashboardLoader = () => (
-  <div className="flex items-center justify-center h-screen bg-gradient-to-br from-gray-900 to-gray-950">
-    <div className="text-center">
-      <motion.div
-        animate={{ rotate: 360 }}
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        className="w-16 h-16 border-4 border-rose-600 border-t-transparent rounded-full mx-auto mb-4"
-      ></motion.div>
-      <h2 className="text-xl font-semibold text-white mb-2">Loading Dashboard</h2>
-      <p className="text-gray-400">Preparing your learning experience</p>
-    </div>
-  </div>
-);
-
-const Dashboard = () => {
-  const { isSignedIn, isLoading } = useAuth();
-  const navigate = useNavigate();
-
-  if (isLoading) {
-    return <DashboardLoader />;
-  }
-
-  if (!isSignedIn) {
-    return (
-      <div className="min-h-screen bg-gray-900 flex items-center justify-center">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center"
-        >
-          <h2 className="text-2xl font-bold text-white mb-4">Authentication Required</h2>
-          <p className="text-gray-400 mb-6">Please log in to access your dashboard</p>
-          <button
-            onClick={() => navigate('/login')}
-            className="px-6 py-3 bg-primary hover:bg-primary-dull rounded-lg font-medium text-white transition-colors"
-          >
-            Go to Login
-          </button>
-        </motion.div>
-      </div>
-    );
-  }
-
-  return (
-    <Suspense fallback={<DashboardLoader />}>
-      <DashboardContent />
-    </Suspense>
   );
 };
 
